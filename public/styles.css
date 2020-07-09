@@ -1,6 +1,8 @@
 :root {
 	direction: rtl;
-	--primary: #3a9cc8;
+	--color1: #21d7fa;
+	--color2: #75c1fd;
+	--primary: linear-gradient(to right, var(--color1), var(--color2));
 	--secondary: #819eac;
 	--bg-color: #ededed;
 	--brightest: #f8f8f8;
@@ -11,7 +13,7 @@
 	--grey: #ddd;
 	--greyer: #ccc;
 	--sectionW: 48rem;
-	--cardW: 14rem;
+	--cardW: 16rem;
 }
 html, body {
 	font-size: 10px;
@@ -28,12 +30,11 @@ body {
 	color: var(--darkest);
 	scroll-behavior: smooth;
 	background-image: linear-gradient(
-		to bottom, var(--secondary), var(--bright));
+		to bottom, var(--brightest), var(--bright));
 	background-repeat: no-repeat;
 	background-size: cover
 }
 li, ol, p, span, ul {font-size: 1.7rem}
-nav {color: var(--bright)}
 nav ul {
 	padding: 10px 0;
 	margin: 0
@@ -42,7 +43,7 @@ nav li {
 	display: inline;
 	font-size: 1.7rem;
 	margin-left: 3.5rem;
-	cursor: pointer
+	cursor: pointer;
 }
 .container {
 	width: 70%;
@@ -50,7 +51,7 @@ nav li {
 	min-height: 100%;
 }
 section {
-	margin: 130px auto;
+	margin: 0 auto;
 	padding-bottom: 30px;
 	background-color: var(--brightest);
 	width: var(--sectionW);
@@ -64,16 +65,11 @@ section {
 	from {opacity: 0;transform: translateY(50px)}
   to {opacity: 1; transform: translateY(0)}
 }
-@keyframes scale {
-	from {transform: scale(0)}
-  65% {transform: scale(120%)}
-  to {transform: scale(100%)}
-}
 h1 {
 	font-size: 3.5rem;
 	color: var(--brightest);
 	width: 100%;
-	background-color: var(--primary);
+	background-image: var(--primary);
 	margin: 0 0 30px 0;
 	text-align: center;
 	border-radius: 3px 3px 0 0;
@@ -86,7 +82,7 @@ h2{font-size: 2rem}
 ul{list-style: disclosure-closed}
 button, input[type="submit"] {
 	font-size: 2.6rem;
-	background-color: var(--primary);
+	background-image: var(--primary);
 	padding: 1rem 2rem;
 	margin: 2.5rem auto;
 	color: var(--brightest);
@@ -99,7 +95,7 @@ button, input[type="submit"] {
 }
 button:hover{transform:translateY(-3px)}
 button:disabled, .disabled{
-	background-color: var(--grey);
+	background: var(--grey);
 	cursor: initial;
 	pointer-events: none
 }
@@ -116,7 +112,7 @@ input {
 	color: var(--darkest);
 	box-sizing: border-box
 }
-input[type="checkbox"]{
+input[type="checkbox"], input[type="radio"]{
 	width: initial;
 	min-height: initial;
 	margin-left: 1rem;
@@ -128,9 +124,12 @@ label {
 	display: block;
 	text-align: right;
 }
-mikve-cards{
+.mikve-cards{
 	max-height: 40rem;
 	overflow-y: auto;
+	display: flex;
+	-webkit-overflow-scrolling: touch;
+	-moz-overflow-scrolling: touch;
 }
 .card{
   margin: 1rem;
@@ -141,12 +140,63 @@ mikve-cards{
   transition-property: transform, background-color;
 	transition-duration: .2s;
 	cursor: pointer;
+	position: relative;
 }
 .card:hover{transform: translateY(-1rem)}
 .card-pic{width: var(--cardW); border-radius: 3px 3px 0 0;}
-.mikve.card.active{
-	background-color: var(--primary);
+mikve-card.active{
+	background-color: var(--color2);
 	color: var(--brightest);
+}
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: rgba(255,255,255,.7);
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.checkmark {
+	position: absolute;
+	top: 4rem; left: 5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  margin: 10% auto;
+  box-shadow: inset 0px 0px 0px var(--brightest);
+  animation: fill .4s ease-in-out .4s forwards,
+		scale .3s ease-in-out .9s both;
+}
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px var(--good);
+		/* maybe --primary? */
+  }
 }
 .stars{
 	min-width: 120px;
@@ -158,85 +208,42 @@ mikve-cards{
 	margin-right: 1px;
 }
 .pointer{cursor: pointer}
-table tr:nth-of-type(odd){background-color:var(--bg-color)}
-table tr:nth-of-type(even){background-color:var(--bright)}
-table button, li button {
-	font-size: 1.5rem;
-	margin: 0;
-	padding: .5rem .7rem
+table{
+	width: 100%;
 }
-td, th {
+th{width: calc(100% / 7); font-weight: normal;}
+tr{
+	background-color:var(--bg-color);
+	height: 7rem;
+}
+thead tr{
+	background-color:var(--secondary);
+	color: var(--brightest);
+	height: unset;
+}
+td, th{
 	padding: 1rem;
 	font-size: 1.5rem;
-	text-align: center
+	text-align: center;
 }
-td{font-weight:lighter}
-.danger{background-color:var(--danger);color:var(--bg-color)}
-.good{background-color:var(--good);color:var(--bg-color)}
+td:not(.allowed){opacity: .5}
+td.today{position: relative}
+td.today::before{
+	content: '@';
+	color: var(--color2);
+	position: absolute;
+	top: 0;
+}
+td.allowed{
+	cursor: pointer;
+	font-weight: bold;
+}
+td.allowed:hover{background-color: var(--grey)}
+.danger{background: var(--danger);color:var(--bg-color)}
+.good{background: var(--good);color:var(--bg-color)}
 .danger-txt{color:var(--danger)}
 .good-txt{color:var(--good)}
-.appartments, .mxh-40 {
-	max-height: 40rem;
-	overflow-y: auto
-}
-appartment-button {
-	display: inline-block;
-	width: 50%;
-	text-align: center;
-	margin-bottom: 4rem;
-	position: relative;
-	animation: fadeIn .5s;
-}
-appartment-button span,
-.search-filters span {
-	border-radius: 50%;
-	display: inline-block;
-	color: var(--primary);
-	cursor: pointer
-}
-appartment-button .number {
-	background-color: var(--bg-color);
-	padding: 2rem;
-	width: 4rem;
-	height: 4rem;
-	font-size: 3rem;
-	transition: background-color .3s, color .3s
-}
-appartment-button .number:hover {background-color: var(--grey)}
-appartment-button .number.active{
-	background-color: var(--primary);
-	color: var(--bright);
-}
-appartment-button .ask, appartment-button .give{
-	position: absolute;
-	bottom: 0;
-	width: 1.5rem;
-	height: 1.5rem;
-	font-size: 1.5rem;
-	padding: .8rem;
-	animation: scale .5s backwards .5s;
-	font-weight: 700;
-	color: var(--bg-color)
-}
-appartment-button .stars{
-	display: inline-block;
-	width: 2rem;
-	position: absolute;
-	top: 0; right: 3rem;
-	color: var(--primary);
-	animation: scale .5s backwards 1s;
-}
-appartment-button .ask {background-color: var(--danger); left: 25%}
-appartment-button .give {background-color: var(--good); right: 25%}
-.search-filters .ask,
-.search-filters .give {
-	height: 1.6rem;
-	width: 1.6rem;
-	margin: .5rem
-}
-.search-filters .ask {background-color: var(--danger)}
-.search-filters .give {background-color: var(--good)}
-.search-filters .active{border: 2px solid var(--darkest)}
+
 @keyframes fromTop {
 	from {top: -300px; opacity: 0}
   to {top: 0; opacity: 1}
@@ -248,7 +255,7 @@ appartment-button .give {background-color: var(--good); right: 25%}
 .back{
 	top: -3rem; right: .5rem;
 }
-.back:hover{color: var(--primary)}
+.back:hover{color: var(--color2)}
 .pos-rel{position: relative}
 .close, .back {
 	font-size: 2.8rem;
@@ -309,15 +316,21 @@ h4{font-size:22px;font-weight:100}
 address-table{display: block}
 .w-80p{width:80%}
 .middle{text-align:center}
-.flex, .flex-row {
+.flex {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-around;
 }
+.apart{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: baseline;
+}
 .small-btn{
 	font-size:1.7rem;
 	margin:1.7rem 0;
-	background-color: var(--secondary)
+	background: var(--secondary)
 }
 .bold{font-weight: bold}
 .faded{opacity: .6}
@@ -326,7 +339,6 @@ address-table{display: block}
 .mb-1{margin-bottom:1rem}
 .mb-5{margin-bottom:50px}
 .mb-2{margin-bottom:20px}
-.description{margin-right:50px}
 .mxw-250{max-width:250px}
 .mxw-400{max-width:400px}
 .m-5{margin:50px}
@@ -353,7 +365,7 @@ input:focus{box-shadow:0 0 15px -5px var(--primary)}
 .shadow{box-shadow: 0 5px 15px -2px rgba(0, 0, 0, 0.1);}
 .soft-brd{border: 1px var(--grey) solid}
 .m-1{margin: 1rem;}
-.secondary{background-color: var(--secondary)}
+.secondary{background: var(--secondary)}
 .align-l{text-align: left}
 .select {
   position: relative;
@@ -424,14 +436,6 @@ star-btn, contact-btn{
 	font-size: 0;
 	margin: 0 0.2rem;
 }
-star-btn:hover, contact-btn.enabled:hover{
-	background-color: var(--primary);
-	filter: none;
-}
-star-btn.lit, contact-btn.enabled{
-	background-color: var(--secondary);
-	filter: none; cursor: default
-}
 footer{
   background-color: var(--darkest);
   color: var(--brightest);
@@ -447,13 +451,13 @@ footer{
     -moz-tap-highlight-color: rgba(0, 0, 0, 0);
 	}
   .container{width: 95%}
-  section{margin: 4rem 0; width: 100%;}
+  section{margin: 1rem 0; width: 100%;}
 	.p-side-3{padding-right: 1rem; padding-left: 1rem;}
   .m-5{margin: 30px 10px}
   .description{margin-right: 10px}
 	input{font-size: 1.7rem; padding: 0 1rem;}
-	table button{margin: .5rem; padding: .5rem 1rem;}
 	ol, ul{padding-right: 2.5rem}
+	td,th{padding: 0}
   .nav{
 	  transition: left .5s ease, border-radius .5s .2s;
 		background-image: linear-gradient(to bottom,
@@ -526,9 +530,4 @@ footer{
 	.modal{padding-top: 3rem}
   .modal-content{width:80%}
 	appartment-button .stars{right: 2rem;}
-	.flex-row{
-		flex-wrap: unset;
-		justify-content: unset;
-		-webkit-overflow-scrolling: touch;
-	}
 }

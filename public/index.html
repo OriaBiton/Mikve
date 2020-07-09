@@ -14,6 +14,17 @@
 	<link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
 </head>
 <body>
+	<svg viewBox="0 0 500 80" preserveAspectRatio="none" style="width: 100%;">
+		<defs>
+			<linearGradient id="main-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+				<stop offset="0%" style="stop-color: var(--color1)"></stop>
+				<stop offset="100%" style="stop-color: var(--color2)"></stop>
+			</linearGradient>
+		</defs>
+		<path d="M0.00,49.98 C150.00,150.00 271.49,
+		-50.00 500.00,49.98 L500.00,0.00 L0.00,0.00 Z"
+		style="stroke: none; fill: url(#main-gradient);"></path>
+	</svg>
 	<div id="is-nav"></div>
 	<nav>
 		<div class="nav-toggle">
@@ -34,7 +45,7 @@
 		<section id="enter-via-sms" class="hidden">
 			<h1>כניסה</h1>
 			<form class="p-side-3">
-				<h2>🧾 מלאו את הפרטים והצטרפו לשאר הדיירים:</h2>
+				<h2>🧾 מלאי את הפרטים והכנסי לחשבונך האישי.</h2>
 				<p><strong>כניסה באמצעות הודעת SMS לנייד</strong></p>
 				<div class="field">
 					<label for="name">שם:</label>
@@ -88,9 +99,45 @@
 				<span class="back" onclick="Render.Sections.home(event)" title="חזרה לדף הבית">
 					➜
 				</span>
-				<h2>בחרי מקווה בו תעדיפי לטבול:</h2>
-				<mikve-cards></mikve-cards>
+				<h2>💧 בחרי מקווה בו תעדיפי לטבול:</h2>
+				<div class="mikve-cards"></div>
+				<p class="description"></p>
 				<button id="set-mikve-btn" disabled>קביעת תור</button>
+			</div>
+		</section>
+
+		<section id="choose-time" class="hidden">
+			<h1>יום ושעה</h1>
+			<div class="p-side-3 pos-rel">
+				<span class="back" onclick="Render.Sections.chooseMikve(event)" title="חזרה לבחירת מקווה">
+					➜
+				</span>
+				<div class="apart">
+					<h2>🕒 בחרי תאריך ושעה:</h2>
+					<div class="">
+						<input id="schedule-to-heb" type="radio" value="heb" checked name="type">
+						<label for="schedule-to-heb" class="inline">עברי</label>
+						<input id="schedule-to-greg" type="radio" value="greg" name="type">
+						<label for="schedule-to-greg" class="inline">לועזי</label>
+					</div>
+				</div>
+
+				<table>
+					<thead>
+						<tr>
+							<th>ראשון</th>
+							<th>שני</th>
+							<th>שלישי</th>
+							<th>רביעי</th>
+							<th>חמישי</th>
+							<th>שישי</th>
+							<th>שבת</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<button id="set-time-btn" disabled>אישור</button>
 			</div>
 		</section>
 
@@ -149,18 +196,17 @@
 	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-functions.js"></script>
 	<script src="assets/notyf/notyf.min.js"></script>
+	<script src="assets/hebcal/hebcal.noloc.min.js"></script>
 	<script src="assets/js/auth.js"></script>
 	<script src="assets/js/database.js"></script>
 	<script src="assets/js/helper.js"></script>
-	<script src="assets/js/map.js"></script>
+	<!-- <script src="assets/js/map.js"></script> -->
 	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW04Xy36GVvOHkODIRBhMsV4m1awLfZeg&libraries=places&language=he&region=IL&callback=initMap" async defer></script> -->
 	<script src="assets/js/render.js"></script>
 	<script src="assets/js/validate.js"></script>
 	<script src="assets/js/listeners.js"></script>
 	<script src="assets/components/polyfill/loader.js"></script>
-	<script src="assets/components/mikve-cards.js"></script>
-
-	<!-- <script src="hebcal.min.js"></script> -->
+	<script src="assets/components/mikve-card.js"></script>
 	<script src="script.js"></script>
 </body>
 </html>

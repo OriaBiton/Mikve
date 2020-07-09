@@ -3,7 +3,7 @@ class Listeners {
   static addAllDocumentListeners(){
     Listeners.addListenersToLoginSection();
     Listeners.addListenersToHomeSection();
-    Listeners.addListenersToLobbySection();
+    Listeners.addListenersToChooseMikveSection();
     Listeners.addListenersToSettingsSection();
     // window.onbeforeunload = function() {
     //   return "בטוחים שברצונכם לצאת מהאפליקציה?"};
@@ -21,8 +21,8 @@ class Listeners {
     byId('set-appointment-btn').addEventListener('click', Render.Sections.chooseMikve);
   }
 
-  static addListenersToLobbySection(){
-    
+  static addListenersToChooseMikveSection(){
+    byId('set-mikve-btn').addEventListener('click', Render.Sections.chooseTime);
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);

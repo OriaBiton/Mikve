@@ -1,5 +1,104 @@
 class Render {
+  static fullRender(){
+    Render.listMikvaot();
+    Render.setScheduleTable();
+  }
+  static listMikvaot(){
+    const sect = sections.chooseMikve;
+    const cardsDiv = sect.querySelector('.mikve-cards');
+    Database.getMikvaot().then(s => s.forEach(addCard));
 
+    function addCard(m){
+      const card = new MikveCard(m);
+      cardsDiv.appendChild(card);
+    }
+  }
+  static setScheduleTable(){
+    const sect = sections.chooseTime;
+    const tbody = sect.querySelector('tbody');
+    const todaysDate = new Date();
+    const dayOfWeek = todaysDate.getDay();
+    let hDate = new Hebcal.HDate(todaysDate/*deletable*/).before(0); //Start from last Sunday
+    const visibleWeeks = 3;
+    const clickableFutureDays = 7;
+    let isInThePast = true;
+    let daysToTheFuture = 0;
+
+    for (let i = 0; i < visibleWeeks; i++) {
+      const tr = document.createElement('tr');
+      for (let j = 0; j < 7; j++) {
+        const isToday = hDate.greg().getDate() == todaysDate.getDate();
+        const td = document.createElement('td');
+        td.innerText = gematriya(hDate.day);
+        if (isToday) {
+          td.classList.add('today');
+          isInThePast = false;
+        }
+        if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
+          td.classList.add('allowed');
+          daysToTheFuture++;
+        }
+        tr.appendChild(td);
+        hDate = hDate.next();
+      }
+      tbody.appendChild(tr);
+    }
+    //document.querySelector('h1').innerText
+
+    function gematriya(n){
+      const letters = [
+        'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'יא', 'יב', 'יג',
+        'יד', 'טו', 'טז', 'יז', 'יח', 'יט', 'כ', 'כא', 'כב', 'כג', 'כד',
+        'כה', 'כו', 'כז', 'כח', 'כט', 'ל', 'לא'
+      ];
+      return letters[--n];
+    }
+  }
+  static async listHours(){
+    const data = await (await fetch('https://www.hebcal.com/shabbat/?cfg=json&geonameid=295548&m=50')).json();
+    const items = data.items;
+    let hour;
+    let minutes;
+    for (const item of items){
+      if (item.category == 'candles'){
+        hour = getHour(item.date);
+        minutes = getMinutes(item.date);
+      }
+      else if (item.category == 'havdalah'){
+        const time = ConvertToHourString(item.date);
+      }
+    }
+    console.log(hour, minutes);
+    //LIST...
+    const start = {h: hour, m: roundMin(minutes)};
+    const end = {h: 22, m: 0};
+    const step = 5;
+    let iM = start.m;
+    for (let iH = start.h; iH <= end.h; iH++) {
+      while (iM < 60) {
+        if (iH == end.h && iM > end.m) break;
+        console.log(iH, iM);
+        iM += step;
+      }
+      iM -= 60;
+    }
+
+    function roundMin(m){
+      return Math.ceil(m / 5) * 5;
+    }
+    function getHour(date){
+      const dt = new Date(date);
+      return dt.getHours();
+    }
+    function getMinutes(date){
+      const dt = new Date(date);
+      return dt.getMinutes();
+    }
+    function ConvertToHourString(date){
+      const dt = new Date(date);
+      return dt.getHours() + ':' + dt.getMinutes();
+    }
+  }
 }
 
 Render.Sections = class Sections {
@@ -15,45 +114,9 @@ Render.Sections = class Sections {
     hide(loading);
   }
 
-  static async wasLobby(placeId, entry, num){
-    const lobbyObj = await Database.getLobby(placeId, entry);
-    const lobby = lobbyObj.val();
-    const sect = sections.lobby;
-    const lobbyKey = placeId + entry;
-    sect.dataset.key = lobbyKey;
-    sect.dataset.num = num;
-    sect.querySelector('h1').innerText = lobby.name;
-
-    deletePreviouslyRenderedAppartments();
-    deletePreviouslyRenderedInfo();
-
-    await renderAppartments();
-
-    Render.addAllAppartmentInfo(lobbyObj);
-    Render.userItemLists();
-    Render.Sections.activate('lobby');
-    promptAppartmentName();
-
-    function promptAppartmentName(){
-      const name = lobby.appartments[num].name;
-      if (name) return;
-      else unhide(sect.querySelector('.head-msg'));
-    }
-    async function renderAppartments(){
-      const appartments = lobby.appartments;
-      for (const number in appartments){
-        const apBtn = new AppartmentButton(number);
-        sect.querySelector('.appartments').appendChild(apBtn);
-      }
-    }
-    function deletePreviouslyRenderedInfo(){
-      const aps = sect.getElementsByTagName('appartment-info');
-      for (let i = aps.length - 1; i >= 0; i--) aps[i].remove();
-    }
-    function deletePreviouslyRenderedAppartments(){
-      const aps = sect.getElementsByTagName('appartment-button');
-      for (let i = aps.length - 1; i >= 0; i--) aps[i].remove();
-    }
+  static chooseTime(e){
+    e.preventDefault();
+    Render.Sections.activate('chooseTime');
   }
 
   static chooseMikve(e){
@@ -86,18 +149,8 @@ Render.Sections = class Sections {
 
     const sect = sections.settings;
     if (!sect.hasClass('hidden')) return back();
-    await setHideContactBox();
     show();
 
-    async function setHideContactBox(){
-      const hideContactBox = sect.querySelector('#hide-contact');
-      if (!Render.Sections.checkedHideContactInDb) {
-        const path = `users/${user.uid}/hideContact`;
-        hideContact = await Database.getValOnce(path);
-        Render.Sections.checkedHideContactInDb = true;
-      }
-      hideContactBox.checked = hideContact;
-    }
     function show(){
       const shownSection = getActiveSection();
       lastActiveSection = shownSection;
