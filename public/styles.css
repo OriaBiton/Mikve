@@ -226,19 +226,27 @@ td, th{
 	font-size: 1.5rem;
 	text-align: center;
 }
-td:not(.allowed){opacity: .5}
-td.today{position: relative}
-td.today::before{
-	content: '@';
+td:not(.allowed){opacity: .4}
+td.today, td.first-in-heb-month, td.first-in-greg-month, td.holiday{
+	position: relative;
+}
+td.today::before,
+td.first-in-heb-month::before,
+td.first-in-greg-month::before,
+td.holiday::before{
+	font-weight: normal;
 	color: var(--color2);
 	position: absolute;
-	top: 0;
+	bottom: 0; right: 3px;
 }
-td.allowed{
-	cursor: pointer;
-	font-weight: bold;
-}
+td.today::before{content: 'היום';}
+td.first-in-heb-month::before{content: attr(data-heb-month);}
+td.first-in-greg-month::before{content: attr(data-greg-month-string);}
+td.holiday::before{content: attr(data-holiday);}
+td.allowed{cursor: pointer;}
 td.allowed:hover{background-color: var(--grey)}
+td.active{background: var(--primary); color: var(--brightest)}
+table span {font-size: 2rem;}
 .danger{background: var(--danger);color:var(--bg-color)}
 .good{background: var(--good);color:var(--bg-color)}
 .danger-txt{color:var(--danger)}

@@ -3,6 +3,19 @@ class Render {
     Render.listMikvaot();
     Render.setScheduleTable();
   }
+  static shiftScheduleType(e){
+    const sect = sections.chooseTime;
+    const hebSpan = sect.querySelectorAll('table .date-heb');
+    const gregSpans = sect.querySelectorAll('table .date-greg');
+    if (e.target.value == 'heb') {
+      for (const s of gregSpans) hide(s);
+      for (const s of hebSpan) unhide(s);
+    }
+    else {
+      for (const s of hebSpan) hide(s);
+      for (const s of gregSpans) unhide(s);
+    }
+  }
   static listMikvaot(){
     const sect = sections.chooseMikve;
     const cardsDiv = sect.querySelector('.mikve-cards');
@@ -18,7 +31,7 @@ class Render {
     const tbody = sect.querySelector('tbody');
     const todaysDate = new Date();
     const dayOfWeek = todaysDate.getDay();
-    let hDate = new Hebcal.HDate(todaysDate/*deletable*/).before(0); //Start from last Sunday
+    let hDate = new Hebcal.HDate().before(0); //Start from last Sunday
     const visibleWeeks = 3;
     const clickableFutureDays = 7;
     let isInThePast = true;
@@ -27,15 +40,38 @@ class Render {
     for (let i = 0; i < visibleWeeks; i++) {
       const tr = document.createElement('tr');
       for (let j = 0; j < 7; j++) {
-        const isToday = hDate.greg().getDate() == todaysDate.getDate();
+        const greg = hDate.greg();
+        const gregDay = greg.getDate();
+        const gregMonthInt = greg.getMonth() + 1;
+        const gregMonthString = greg.toLocaleString('he', { month: 'long' });
+        const isToday = gregDay == todaysDate.getDate();
+        const isFirstInHebMonth = hDate.day === 1;
+        const isFirstInGregMonth = gregDay === 1;
+        const holidays = hDate.holidays();
         const td = document.createElement('td');
-        td.innerText = gematriya(hDate.day);
+
+        td.dataset.hebDay = gematriya(hDate.day);
+        td.dataset.hebMonth = hDate.getMonthName('h');
+        td.dataset.gregDay = gregDay;
+        td.dataset.gregMonthInt = gregMonthInt;
+        td.dataset.gregMonthString = gregMonthString;
+        td.dataset.gregYear = greg.getFullYear();
+        td.innerHTML = `<span class="date-heb">${td.dataset.hebDay}</span>
+          <span class="date-greg hidden">${gregDay}</span>`;
         if (isToday) {
           td.classList.add('today');
           isInThePast = false;
         }
+        if (isFirstInHebMonth) td.classList.add('first-in-heb-month');
+        if (isFirstInGregMonth) td.classList.add('first-in-greg-month');
+        if (holidays.length && holidays[0].desc[2] != 'ראש חודש') {
+          td.classList.add('holiday');
+          td.dataset.holiday = holidays[0].desc[2].replace('שבת ', '')
+            .replace('צום ', '');
+        }
         if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
           td.classList.add('allowed');
+          td.addEventListener('click', setDate);
           daysToTheFuture++;
         }
         tr.appendChild(td);
@@ -43,7 +79,6 @@ class Render {
       }
       tbody.appendChild(tr);
     }
-    //document.querySelector('h1').innerText
 
     function gematriya(n){
       const letters = [

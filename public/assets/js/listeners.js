@@ -4,6 +4,7 @@ class Listeners {
     Listeners.addListenersToLoginSection();
     Listeners.addListenersToHomeSection();
     Listeners.addListenersToChooseMikveSection();
+    Listeners.addListenersToChooseTimeSection();
     Listeners.addListenersToSettingsSection();
     // window.onbeforeunload = function() {
     //   return "בטוחים שברצונכם לצאת מהאפליקציה?"};
@@ -23,6 +24,10 @@ class Listeners {
 
   static addListenersToChooseMikveSection(){
     byId('set-mikve-btn').addEventListener('click', Render.Sections.chooseTime);
+  }
+  static addListenersToChooseTimeSection(){
+    qAll('input[name="schedule-type"]').forEach(i =>
+      i.addEventListener('change', Render.shiftScheduleType));
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);

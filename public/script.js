@@ -16,6 +16,30 @@ Render.fullRender();
 //serviceWorker();
 
 // Function Definitions
+function setDate(e){
+  const td = e.target.nodeName == 'TD' ?
+    e.target : e.target.closest('td');
+  const isActive = td.classList.contains('active');
+
+  markDate();
+
+  function markDate(){
+    const tbody = td.closest('tbody');
+    if (isActive) return deactivate();
+    const currentlyActive = tbody.querySelector('td.active');
+    deactivate(currentlyActive);
+    td.classList.add('active');
+
+    function deactivate(c){
+      if (c) {
+         c.classList.remove('active');
+      }
+      else {
+        td.classList.remove('active');
+      }
+    }
+  }
+}
 function selectMikve(e){
   const sect = sections.chooseMikve;
   const card = e.target.closest('.card');
@@ -38,8 +62,9 @@ function selectMikve(e){
   function markMikve(){
     const cardsDiv = card.closest('.mikve-cards');
     const checkmark = card.querySelector('.checkmark');
+    const currentlyActive = cardsDiv.querySelector('.card.active');
     if (isActive) return deactivate();
-    cardsDiv.querySelectorAll('.card.active').forEach(deactivate);
+    deactivate(currentlyActive);
     card.classList.add('active');
     unhide(checkmark);
 
