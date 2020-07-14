@@ -5,6 +5,7 @@ class Listeners {
     Listeners.addListenersToHomeSection();
     Listeners.addListenersToChooseMikveSection();
     Listeners.addListenersToChooseTimeSection();
+    Listeners.addListenersToConfirmSection();
     Listeners.addListenersToSettingsSection();
     // window.onbeforeunload = function() {
     //   return "בטוחים שברצונכם לצאת מהאפליקציה?"};
@@ -30,6 +31,9 @@ class Listeners {
       i.addEventListener('change', Render.shiftScheduleType));
     byId('select-hour').addEventListener('change', setHour);
     byId('set-time-btn').addEventListener('click', Render.Sections.confirm);
+  }
+  static addListenersToConfirmSection(){
+    byId('confirm-btn').addEventListener('click', setAppointment);
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);

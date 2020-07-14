@@ -8,7 +8,7 @@ var tdToClick;
 const isMobile = checkIsMobile();
 const sections = getSections();
 const db = firebase.database();
-const functions = firebase.app().functions('us-central1');
+const functions = firebase.app().functions('europe-west3');
 const notyf = getNotyf();
 Hebcal.defaultCity = 'Jerusalem';
 
@@ -19,6 +19,25 @@ Render.fullRender();
 //serviceWorker();
 
 // Function Definitions
+async function deleteAppointment(){
+  
+}
+async function setAppointment(){
+  Render.Sections.loading();
+  const set = functions.httpsCallable('setAppointment');
+  const obj = {time: selectedTime, mikve: selectedMikve};
+  const data = {
+    key: selectedMikve.key,
+    day: selectedTime.date.gregDay,
+    hour: selectedTime.hour.value,
+    month: selectedTime.date.gregMonthInt,
+    year: selectedTime.date.gregYear,
+    obj: JSON.stringify(obj)
+  };
+  await set(data).catch(e => {throw e});
+  Render.Sections.home();
+
+}
 function setHour(){
   const sect = sections.chooseTime;
   const td = sect.querySelector('td.active');
@@ -34,7 +53,7 @@ function setHour(){
 
   function setGlobalVar(){
     selectedTime.date = data;
-    selectedTime.hour = hour;
+    selectedTime.hour = {value: hasValue, text: hour};
   }
   function setButton(){
     sect.querySelector('#set-time-btn').disabled = !hasValue;

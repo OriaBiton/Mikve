@@ -136,7 +136,10 @@ Render.Sections = class Sections {
     else Render.Sections.login();
     hide(loading);
   }
-
+  static loading(){
+    hide(getActiveSection());
+    unhide(byId('loading'));
+  }
   static confirm(e){
     e.preventDefault();
     fillDescriptions();
@@ -150,7 +153,7 @@ Render.Sections = class Sections {
         const d = selectedTime.date;
         const txt = `${d.hebDay} ב${d.hebMonth}
           ${d.gregDay} ב${d.gregMonthString} ${d.gregYear}
-          בשעה ${selectedTime.hour}`;
+          בשעה ${selectedTime.hour.text}`;
         byId('confirm-time-desc').innerText = txt;
       }
       function mikve(){
@@ -229,12 +232,44 @@ Render.Sections = class Sections {
     Render.Sections.activate('chooseMikve');
   }
 
-  static async home(e){
-    if (e) e.preventDefault();
+  static async home(){
+    await renderAppointment();
     greet();
-
     Render.Sections.activate('home');
 
+    async function renderAppointment(){
+      await getAppointment();
+      showAppointment();
+
+      function showAppointment(){
+        const table = new AppointmentTable(true);
+        const div = byId('my-appointment');
+        const btn = byId('set-appointment-btn');
+        div.appendChild(table);
+        hide(btn);
+        unhide(div);
+      }
+      async function getAppointment(){
+        if (selectedMikve && selectedTime) return false;
+        const data = await getData();
+        if (!data) return false;
+        selectedMikve = data.mikve;
+        selectedTime = data.time;
+
+        async function getData(){
+          const uid = Auth.getUser().uid;
+          const path = `users/${uid}/appointments`;
+          let data;
+          await db.ref(path).once('value', snap => {
+            if (snap.exists()) {
+              const obj = Object.values(snap.val())[0];
+              data = JSON.parse(obj.data);
+            }
+          });
+          return data;
+        }
+      }
+    }
     function greet(){
       const user = Auth.getUser();
       const name = user.displayName;
@@ -270,7 +305,9 @@ Render.Sections = class Sections {
   }
 
   static activate(n){
+    const loading = byId('loading');
     const active = getActiveSection();
+    hide(loading);
     if (active) toggleHide(active);
     toggleHide(sections[n]);
   }

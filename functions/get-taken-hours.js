@@ -1,7 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-exports.fn = functions.https.onCall(async (data, context) => {
+exports.fn = functions.region('europe-west3').https
+  .onCall(async (data, context) => {
   const db = admin.database();
   //const hourRanges = await getRanges(mikveName);
   return await getTakenHours(data.mikveName);
