@@ -28,6 +28,8 @@ class Listeners {
   static addListenersToChooseTimeSection(){
     qAll('input[name="schedule-type"]').forEach(i =>
       i.addEventListener('change', Render.shiftScheduleType));
+    byId('select-hour').addEventListener('change', setHour);
+    byId('set-time-btn').addEventListener('click', Render.Sections.confirm);
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);

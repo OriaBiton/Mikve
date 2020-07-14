@@ -34,6 +34,9 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover
 }
+.header-wave stop[offset="0%"]{stop-color: var(--color1)}
+.header-wave stop[offset="100%"]{stop-color: var(--color2)}
+.header-wave path{fill: url(#grad)}
 li, ol, p, span, ul {font-size: 1.7rem}
 nav ul {
 	padding: 10px 0;
@@ -57,7 +60,7 @@ section {
 	width: var(--sectionW);
 	border: 1px var(--bright) solid;
 	box-shadow: 0 5px 15px -2px rgba(0, 0, 0, .3);
-	border-radius: 5px;
+	border-radius: 14px;
 	animation: floatUp 1s;
 	position: relative;
 }
@@ -66,18 +69,19 @@ section {
   to {opacity: 1; transform: translateY(0)}
 }
 h1 {
-	font-size: 3.5rem;
+	font-size: 4rem;
 	color: var(--brightest);
 	width: 100%;
-	background-image: var(--primary);
-	margin: 0 0 30px 0;
+	margin: 0;
 	text-align: center;
-	border-radius: 3px 3px 0 0;
-	padding: 5px 0;
 	font-weight: 100;
+	position: absolute;
 }
+.h1-wave{border-radius: inherit}
+.h1-wave svg{border-radius: inherit}
+.h1-wave path{fill: url(#grad);}
 .inline{display:inline}
-h2{font-size: 2rem}
+h2{font-size: 2rem; font-weight: 100;}
 .field{padding:2rem 0}
 ul{list-style: disclosure-closed}
 button, input[type="submit"] {
@@ -115,7 +119,6 @@ input {
 input[type="checkbox"], input[type="radio"]{
 	width: initial;
 	min-height: initial;
-	margin-left: 1rem;
 }
 ::placeholder {opacity: .3}
 label {
@@ -210,6 +213,7 @@ mikve-card.active{
 .pointer{cursor: pointer}
 table{
 	width: 100%;
+	border: 1px solid var(--grey);
 }
 th{width: calc(100% / 7); font-weight: normal;}
 tr{
@@ -221,16 +225,19 @@ thead tr{
 	color: var(--brightest);
 	height: unset;
 }
+thead.large-txt th{font-size: 2rem}
+thead.align-r th{text-align: right}
 td, th{
 	padding: 1rem;
-	font-size: 1.5rem;
 	text-align: center;
+	line-height: 2.5rem;
+	font-size: 1.5rem;
 }
-td:not(.allowed){opacity: .4}
+td.date:not(.allowed){opacity: .4}
 td.today, td.first-in-heb-month, td.first-in-greg-month, td.holiday{
 	position: relative;
 }
-td.today::before,
+td.date::before{font-size: 1.5rem;}
 td.first-in-heb-month::before,
 td.first-in-greg-month::before,
 td.holiday::before{
@@ -239,13 +246,20 @@ td.holiday::before{
 	position: absolute;
 	bottom: 0; right: 3px;
 }
-td.today::before{content: 'היום';}
+td.today::before{
+	content: '';
+	padding: .6rem;
+	background-color: var(--color2);
+	position: absolute;
+	border-radius: 50%;
+	top: 3px; right: 3px;
+}
 td.first-in-heb-month::before{content: attr(data-heb-month);}
 td.first-in-greg-month::before{content: attr(data-greg-month-string);}
 td.holiday::before{content: attr(data-holiday);}
-td.allowed{cursor: pointer;}
-td.allowed:hover{background-color: var(--grey)}
-td.active{background: var(--primary); color: var(--brightest)}
+td.date.allowed{cursor: pointer; transition: background-color .25s}
+td.date.allowed:not(.active):hover{background-color: var(--grey)}
+td.date.active{background-color: var(--color2); color: var(--brightest)}
 table span {font-size: 2rem;}
 .danger{background: var(--danger);color:var(--bg-color)}
 .good{background: var(--good);color:var(--bg-color)}
@@ -306,22 +320,8 @@ table span {font-size: 2rem;}
 }
 .modal li{margin-bottom: 2rem}
 .modal li p{margin: 0; color: var(--darkest)}
-.ask-listing ol, .give-listing ol{
-	max-height: 15rem; overflow-y: auto
-}
-.deletable-li{max-height: 20rem; overflow-y: auto}
-.deletable-li li{animation: floatUp .5s; margin-bottom: 4rem}
-.deletable-li .buttons{float: left}
-.deletable-li .delete-item{
-	font-weight: bold;
-	cursor: pointer;
-	font-size: 2rem;
-}
-.deletable-li .delete-item:hover{color: var(--darkest)}
-.deletable-li button{margin: 0 1rem .5rem;}
 h3{font-size:2.3rem}
 h4{font-size:22px;font-weight:100}
-address-table{display: block}
 .w-80p{width:80%}
 .middle{text-align:center}
 .flex {
@@ -329,17 +329,12 @@ address-table{display: block}
 	flex-wrap: wrap;
 	justify-content: space-around;
 }
-.apart{
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: baseline;
-}
 .small-btn{
 	font-size:1.7rem;
 	margin:1.7rem 0;
 	background: var(--secondary)
 }
+.mxh-40{max-height: 40rem; overflow-y: auto;}
 .bold{font-weight: bold}
 .faded{opacity: .6}
 .mxw-40 input{max-width:95%}
@@ -375,24 +370,29 @@ input:focus{box-shadow:0 0 15px -5px var(--primary)}
 .m-1{margin: 1rem;}
 .secondary{background: var(--secondary)}
 .align-l{text-align: left}
+.float-l{float: left}
 .select {
   position: relative;
   display: flex;
-  width: 12rem;
-  height: 3em;
+  width: 18rem;
+  height: 5em;
   line-height: 3;
   overflow: hidden;
   border-radius: 3px;
 }
 select {
-	background: var(--bright);
+	background-color: var(--bg-color);
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
   flex: 1;
-  padding: 0 .5em;
+  padding: 1rem 3rem;
 	border: 0;
   cursor: pointer;
+	font-size: 2rem;
+	font-family: inherit;
+	color: var(--darkest);
+	transition: background-color .2s, opacity .2s;
 }
 .select::after {
   content: '\25BC';
@@ -402,20 +402,12 @@ select {
   padding: 0 1em;
   cursor: pointer;
   pointer-events: none;
-  transition: .3s color ease;
+	font-size: 1.7rem;
 }
-.select:hover::after {color: var(--primary)}
-
+select:hover{background-color: var(--grey)}
+select:disabled{pointer-events: none; opacity: .4}
 .disabled:hover{transform: none}
 .float-up{animation: floatUp .5s}
-.my-appartment .number{background-color: var(--bright)}
-.my-appartment::before{
-	content: '🏠';
-	position: absolute;
-	font-size: 1.5rem;
-	animation: scale .5s backwards 1.5s;
-	top: 0; right: 29%;
-}
 .head-msg{
 	background-color: var(--bg-color);
 	margin-bottom: 2.5rem;
@@ -431,19 +423,6 @@ select {
 .head-msg input {min-height: 3.5rem; width: unset;}
 .head-msg .close{right: 0; top: 0;}
 small span {font-size: inherit}
-star-btn, contact-btn{
-	border: 3px rgba(255,255,255,.3) solid;
-	padding: 6px;
-	background-color: var(--greyer);
-	transition-property: background-color, filter;
-	transition-duration: .25s;
-	cursor: pointer;
-	border-radius: 50%;
-	filter: grayscale();
-	display: inline-block;
-	font-size: 0;
-	margin: 0 0.2rem;
-}
 footer{
   background-color: var(--darkest);
   color: var(--brightest);
@@ -458,8 +437,10 @@ footer{
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -moz-tap-highlight-color: rgba(0, 0, 0, 0);
 	}
+	.app-desktop-head{height: 0}
   .container{width: 95%}
   section{margin: 1rem 0; width: 100%;}
+	h1{font-size: 3.3rem;}
 	.p-side-3{padding-right: 1rem; padding-left: 1rem;}
   .m-5{margin: 30px 10px}
   .description{margin-right: 10px}
@@ -537,5 +518,9 @@ footer{
   table{font-size:12px}
 	.modal{padding-top: 3rem}
   .modal-content{width:80%}
-	appartment-button .stars{right: 2rem;}
+	thead.large-txt th{padding: 1rem}
+	td.today::before,
+	td.first-in-heb-month::before,
+	td.first-in-greg-month::before,
+	td.holiday::before{font-size: 1.2rem}
 }

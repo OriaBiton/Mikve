@@ -3,11 +3,14 @@
 var lastActiveSection;
 var subscribedToPush;
 var selectedMikve;
+var selectedTime = {};
+var tdToClick;
 const isMobile = checkIsMobile();
 const sections = getSections();
 const db = firebase.database();
-const functions = firebase.app().functions('europe-west3');
+const functions = firebase.app().functions('us-central1');
 const notyf = getNotyf();
+Hebcal.defaultCity = 'Jerusalem';
 
 // Invokations
 if (isMobile) setMobileNav();
@@ -16,13 +19,91 @@ Render.fullRender();
 //serviceWorker();
 
 // Function Definitions
+function setHour(){
+  const sect = sections.chooseTime;
+  const td = sect.querySelector('td.active');
+  const data = td.dataset;
+  const select = sect.querySelector('select');
+  const selected = select.options[select.selectedIndex];
+  const hour = selected.text
+  const hasValue = selected.value;
+
+  fillDescription();
+  setButton();
+  setGlobalVar();
+
+  function setGlobalVar(){
+    selectedTime.date = data;
+    selectedTime.hour = hour;
+  }
+  function setButton(){
+    sect.querySelector('#set-time-btn').disabled = !hasValue;
+  }
+  function fillDescription() {
+    const p = sect.querySelector('.description');
+    const txt = `✔️ בחרת ביום ${Format.toWeekday(data.dayOfWeek)}, ${data.hebDay} ב${data.hebMonth}\
+      (${data.gregDay}/${data.gregMonthInt}/${data.gregYear}), בשעה ${hour}.`;
+    p.innerText = hasValue ? txt : '';
+  }
+}
 function setDate(e){
   const td = e.target.nodeName == 'TD' ?
     e.target : e.target.closest('td');
   const isActive = td.classList.contains('active');
+  const sect = sections.chooseTime;
+  const data = td.dataset;
+  if (!data.ready) {
+    notyf.info('טוען לוח שעות. כמה רגעים בבקשה...');
+    tdToClick = td;
+    return;
+  }
+  if (tdToClick && tdToClick.isSameNode(td)){
+    tdToClick = null;
+    notyf.success('לוח השעות מוכן! את מוזמנת לבחור שעה.');
+  }
 
   markDate();
+  fillHourSelect();
+  clearDescription();
+  disableButton();
 
+  function disableButton(){
+    sect.querySelector('#set-time-btn').disabled = true;
+  }
+  function clearDescription(){
+    sect.querySelector('.description').innerText = '';
+  }
+  function fillHourSelect(){
+    const select = byId('select-hour');
+    select.disabled = isActive;
+    clear();
+    addAllowed();
+    disableTaken();
+
+    function disableTaken(){
+      let taken = data.takenHours;
+      if (!taken) return;
+      taken = taken.split(',');
+      for (const t of taken){
+        const o = select.querySelector(`[value="${t}"]`);
+        o.disabled = true;
+        o.innerText += ' ❌';
+
+      }
+    }
+    function addAllowed(){
+      const allowedHours = data.allowedHours.split(',');
+      for (const hour of allowedHours) {
+        const opt = document.createElement('option');
+        opt.value = hour;
+        opt.innerText = hour.slice(0, 2) + ':' + hour.slice(2);
+        select.add(opt);
+      }
+    }
+    function clear(){
+      for (let i = select.length; i > 0; i--) select.remove(i);
+    }
+  }
   function markDate(){
     const tbody = td.closest('tbody');
     if (isActive) return deactivate();
@@ -31,12 +112,8 @@ function setDate(e){
     td.classList.add('active');
 
     function deactivate(c){
-      if (c) {
-         c.classList.remove('active');
-      }
-      else {
-        td.classList.remove('active');
-      }
+      if (c) c.classList.remove('active');
+      else td.classList.remove('active');
     }
   }
 }
@@ -116,6 +193,7 @@ function getSections(){
     home: byId('home'),
     chooseMikve: byId('choose-mikve'),
     chooseTime: byId('choose-time'),
+    confirm: byId('confirm'),
     settings: byId('settings')
   };
 }

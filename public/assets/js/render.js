@@ -1,7 +1,18 @@
 class Render {
   static fullRender(){
+    Render.h1Background();
     Render.listMikvaot();
     Render.setScheduleTable();
+  }
+  static async h1Background(){
+    const h1s = qAll('h1');
+    const svg = await (await fetch('../../images/h1bg.svg')).text();
+    for (const h1 of h1s) {
+      const div = document.createElement('div');
+      div.classList.add('h1-wave');
+      div.innerHTML = svg;
+      h1.after(div);
+    }
   }
   static shiftScheduleType(e){
     const sect = sections.chooseTime;
@@ -29,8 +40,6 @@ class Render {
   static setScheduleTable(){
     const sect = sections.chooseTime;
     const tbody = sect.querySelector('tbody');
-    const todaysDate = new Date();
-    const dayOfWeek = todaysDate.getDay();
     let hDate = new Hebcal.HDate().before(0); //Start from last Sunday
     const visibleWeeks = 3;
     const clickableFutureDays = 7;
@@ -41,21 +50,26 @@ class Render {
       const tr = document.createElement('tr');
       for (let j = 0; j < 7; j++) {
         const greg = hDate.greg();
+        const dayOfWeek = greg.getDay();
         const gregDay = greg.getDate();
         const gregMonthInt = greg.getMonth() + 1;
         const gregMonthString = greg.toLocaleString('he', { month: 'long' });
-        const isToday = gregDay == todaysDate.getDate();
+        const isToday = gregDay == new Date().getDate();
         const isFirstInHebMonth = hDate.day === 1;
         const isFirstInGregMonth = gregDay === 1;
         const holidays = hDate.holidays();
         const td = document.createElement('td');
 
+        td.classList.add('date')
         td.dataset.hebDay = gematriya(hDate.day);
         td.dataset.hebMonth = hDate.getMonthName('h');
         td.dataset.gregDay = gregDay;
         td.dataset.gregMonthInt = gregMonthInt;
         td.dataset.gregMonthString = gregMonthString;
         td.dataset.gregYear = greg.getFullYear();
+        td.dataset.dayOfWeek = dayOfWeek;
+        td.dataset.sunset = getSunset(hDate);
+
         td.innerHTML = `<span class="date-heb">${td.dataset.hebDay}</span>
           <span class="date-greg hidden">${gregDay}</span>`;
         if (isToday) {
@@ -66,13 +80,32 @@ class Render {
         if (isFirstInGregMonth) td.classList.add('first-in-greg-month');
         if (holidays.length && holidays[0].desc[2] != 'ראש חודש') {
           td.classList.add('holiday');
-          td.dataset.holiday = holidays[0].desc[2].replace('שבת ', '')
-            .replace('צום ', '');
+          td.dataset.holiday = holidays[0].desc[2]
+            .replace('שבת ', '').replace('צום ', '');
         }
         if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
           td.classList.add('allowed');
           td.addEventListener('click', setDate);
           daysToTheFuture++;
+          addShabbat();
+
+          function addShabbat(){
+            let time;
+            let timeName;
+            const candles = hDate.candleLighting();
+            const havdala = hDate.havdalah();
+            if (candles) {
+              timeName = 'candles';
+              time = candles;
+            }
+            else if (havdala) {
+              timeName = 'havdala';
+              time = havdala;
+            }
+            else return;
+            td.dataset[timeName] = `${time.getHours()}:${time.getMinutes()}`;
+          }
+
         }
         tr.appendChild(td);
         hDate = hDate.next();
@@ -80,6 +113,10 @@ class Render {
       tbody.appendChild(tr);
     }
 
+    function getSunset(d){
+      const eve = d.gregEve();
+      return `${eve.getHours()}:${eve.getMinutes()}`;
+    }
     function gematriya(n){
       const letters = [
         'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'יא', 'יב', 'יג',
@@ -89,69 +126,102 @@ class Render {
       return letters[--n];
     }
   }
-  static async listHours(){
-    const data = await (await fetch('https://www.hebcal.com/shabbat/?cfg=json&geonameid=295548&m=50')).json();
-    const items = data.items;
-    let hour;
-    let minutes;
-    for (const item of items){
-      if (item.category == 'candles'){
-        hour = getHour(item.date);
-        minutes = getMinutes(item.date);
-      }
-      else if (item.category == 'havdalah'){
-        const time = ConvertToHourString(item.date);
-      }
-    }
-    console.log(hour, minutes);
-    //LIST...
-    const start = {h: hour, m: roundMin(minutes)};
-    const end = {h: 22, m: 0};
-    const step = 5;
-    let iM = start.m;
-    for (let iH = start.h; iH <= end.h; iH++) {
-      while (iM < 60) {
-        if (iH == end.h && iM > end.m) break;
-        console.log(iH, iM);
-        iM += step;
-      }
-      iM -= 60;
-    }
-
-    function roundMin(m){
-      return Math.ceil(m / 5) * 5;
-    }
-    function getHour(date){
-      const dt = new Date(date);
-      return dt.getHours();
-    }
-    function getMinutes(date){
-      const dt = new Date(date);
-      return dt.getMinutes();
-    }
-    function ConvertToHourString(date){
-      const dt = new Date(date);
-      return dt.getHours() + ':' + dt.getMinutes();
-    }
-  }
 }
 
 Render.Sections = class Sections {
   static async renderSections(){
     const loading = byId('loading');
     const user = Auth.getUser();
-    if (user) {
-      await Render.Sections.home();
-    }
-    else {
-      Render.Sections.login();
-    }
+    if (user) await Render.Sections.home();
+    else Render.Sections.login();
     hide(loading);
   }
 
-  static chooseTime(e){
+  static confirm(e){
     e.preventDefault();
+    fillDescriptions();
+    Render.Sections.activate('confirm');
+
+    function fillDescriptions(){
+      mikve();
+      time();
+
+      function time(){
+        const d = selectedTime.date;
+        const txt = `${d.hebDay} ב${d.hebMonth}
+          ${d.gregDay} ב${d.gregMonthString} ${d.gregYear}
+          בשעה ${selectedTime.hour}`;
+        byId('confirm-time-desc').innerText = txt;
+      }
+      function mikve(){
+        const txt = `"${selectedMikve.name}"
+          ${selectedMikve.address}, בת ים`;
+        byId('confirm-mikve-desc').innerText = txt;
+      }
+    }
+  }
+
+  static async chooseTime(e){
+    e.preventDefault();
+    const sect = sections.chooseTime;
+    listHours();
     Render.Sections.activate('chooseTime');
+
+    async function listHours(){
+      const getTakenHours = functions.httpsCallable('getTakenHours');
+      const mikveName = selectedMikve.key;
+      const ranges = getRanges(mikveName);
+      const taken = (await getTakenHours({mikveName})).data;
+      const allowed = sect.querySelectorAll('td.allowed');
+      for (const td of allowed) {
+        let hours;
+        const dayData = td.dataset;
+        const gregDay = dayData.gregDay;
+        const candles = dayData.candles;
+        const havdala = dayData.havdala;
+        let dayType = 'weekdays';
+        if (candles) dayType = 'friday';
+        else if (havdala) dayType = 'saturday';
+        hours = spread(ranges[dayType].from, ranges[dayType].until, dayData);
+        dayData.allowedHours = hours;
+        if (taken[gregDay]) dayData.takenHours = taken[gregDay];
+        td.dataset.ready = true;
+        td.addEventListener('click', setDate);
+      }
+      if (tdToClick) tdToClick.click();
+
+      function getRanges(mikve){
+        const card = q(`mikve-card[data-key="${mikve}"]`);
+        return card.hours[getSeason()];
+
+        function getSeason(){
+          const seasons = ['winter', 'summer'];
+          return seasons[Math.floor(new Date().getMonth() / 12 * 2) % 2];
+        }
+      }
+      function spread(from, until, dayData){
+        from = Format.toHourMinutesObject(from, dayData);
+        until = Format.toHourMinutesObject(until, dayData);
+        const step = 5;
+        let iM = from.minutes;
+        let arr = [];
+        for (let iH = from.hour; iH <= until.hour; iH++) {
+          while (iM < 60) {
+            if (iH == until.hour && iM > until.minutes) break;
+            arr.push(Format.to4Chars(iH, iM));
+            iM += step;
+          }
+          iM -= 60;
+        }
+        return arr;
+
+        function ConvertToHourString(date){
+          const dt = new Date(date);
+          return dt.getHours() + ':' + dt.getMinutes();
+        }
+      }
+
+    }
   }
 
   static chooseMikve(e){

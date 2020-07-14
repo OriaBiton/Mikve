@@ -14,16 +14,15 @@
 	<link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
 </head>
 <body>
-	<svg viewBox="0 0 500 80" preserveAspectRatio="none" style="width: 100%;">
+	<svg class="header-wave" viewBox="0 0 500 80" preserveAspectRatio="none" width: "100%">
 		<defs>
-			<linearGradient id="main-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-				<stop offset="0%" style="stop-color: var(--color1)"></stop>
-				<stop offset="100%" style="stop-color: var(--color2)"></stop>
+			<linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+				<stop offset="0%"></stop>
+				<stop offset="100%"></stop>
 			</linearGradient>
 		</defs>
 		<path d="M0.00,49.98 C150.00,150.00 271.49,
-		-50.00 500.00,49.98 L500.00,0.00 L0.00,0.00 Z"
-		style="stroke: none; fill: url(#main-gradient);"></path>
+		-50.00 500.00,49.98 L500.00,0.00 L0.00,0.00 Z"></path>
 	</svg>
 	<div id="is-nav"></div>
 	<nav>
@@ -112,17 +111,14 @@
 				<span class="back" onclick="Render.Sections.chooseMikve(event)" title="חזרה לבחירת מקווה">
 					➜
 				</span>
-				<div class="apart">
-					<h2>🕒 בחרי תאריך ושעה:</h2>
-					<div>
-						<input id="schedule-to-heb" type="radio" value="heb" checked name="schedule-type">
-						<label for="schedule-to-heb" class="inline">עברי</label>
-						<input id="schedule-to-greg" type="radio" value="greg" name="schedule-type">
-						<label for="schedule-to-greg" class="inline">לועזי</label>
-					</div>
+				<h2>🕒 בחרי תאריך ושעה:</h2>
+				<div class="float-l">
+					<input id="schedule-to-heb" type="radio" value="heb" checked name="schedule-type">
+					<label for="schedule-to-heb" class="inline">עברי</label>
+					<input id="schedule-to-greg" type="radio" value="greg" name="schedule-type">
+					<label for="schedule-to-greg" class="inline">לועזי</label>
 				</div>
-
-				<table>
+				<table class="mb-2">
 					<thead>
 						<tr>
 							<th>ראשון</th>
@@ -137,8 +133,40 @@
 					<tbody>
 					</tbody>
 				</table>
+				<div class="select center">
+					<select id="select-hour" disabled>
+						<option value="" selected>בחרי שעה</option>
+					</select>
+				</div>
+				<p class="description"></p>
 				<button id="set-time-btn" disabled>אישור</button>
 			</div>
+		</section>
+
+		<section id="confirm" class="hidden">
+			<h1>אישור</h1>
+			<div class="p-side-3 pos-rel">
+				<span class="back" onclick="Render.Sections.chooseTime(event)" title="חזרה לבחירת יום ושעה">
+					➜
+				</span>
+				<h2>🎯 אנא ודאי שפרטי התור שלך נכונים:</h2>
+				<table class="mb-2">
+					<thead class="large-txt align-r">
+						<tr>
+							<th>💧 מקווה</th>
+							<th>🕒 זמן</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td id="confirm-mikve-desc"></td>
+							<td id="confirm-time-desc"></td>
+						</tr>
+					</tbody>
+				</table>
+				<button id="confirm-btn">אישור תור</button>
+			</div>
+
 		</section>
 
 		<section id="settings" class="hidden">
@@ -202,8 +230,8 @@
 	<script src="assets/js/helper.js"></script>
 	<!-- <script src="assets/js/map.js"></script> -->
 	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW04Xy36GVvOHkODIRBhMsV4m1awLfZeg&libraries=places&language=he&region=IL&callback=initMap" async defer></script> -->
+	<script src="assets/js/format.js"></script>
 	<script src="assets/js/render.js"></script>
-	<script src="assets/js/validate.js"></script>
 	<script src="assets/js/listeners.js"></script>
 	<script src="assets/components/polyfill/loader.js"></script>
 	<script src="assets/components/mikve-card.js"></script>
