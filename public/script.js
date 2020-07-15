@@ -4,6 +4,7 @@ var lastActiveSection;
 var subscribedToPush;
 var selectedMikve;
 var selectedTime = {};
+var isAppointmentSet;
 var tdToClick;
 const isMobile = checkIsMobile();
 const sections = getSections();
@@ -20,14 +21,37 @@ Render.fullRender();
 
 // Function Definitions
 async function deleteAppointment(){
-  
+  Render.Sections.loading(true);
+  const del = functions.httpsCallable('deleteAppointment');
+  const obj = {time: selectedTime, mikve: selectedMikve};
+  const data = {
+    mikveName: selectedMikve.key,
+    day: selectedTime.date.gregDay,
+    hour: selectedTime.hour.value
+  };
+  await del(data).catch(e => {throw e});
+  resetUI();
+  Render.Sections.loading();
+
+  function resetUI(){
+    isAppointmentSet = false;
+    selectedTime = {};
+    selectedMikve = null;
+    const activeMikve = q('mikve-card.active');
+    const activeDate = q('td.date.active');
+    const confirmTable = q('#confirm appointment-table');
+    Render.showSetAppartmentButton();
+    if (activeMikve) activeMikve.click();
+    if (activeDate) activeDate.click();
+    if (confirmTable) confirmTable.removeSelf();
+  }
 }
 async function setAppointment(){
-  Render.Sections.loading();
+  Render.Sections.loading(true);
   const set = functions.httpsCallable('setAppointment');
   const obj = {time: selectedTime, mikve: selectedMikve};
   const data = {
-    key: selectedMikve.key,
+    mikveName: selectedMikve.key,
     day: selectedTime.date.gregDay,
     hour: selectedTime.hour.value,
     month: selectedTime.date.gregMonthInt,
@@ -35,8 +59,9 @@ async function setAppointment(){
     obj: JSON.stringify(obj)
   };
   await set(data).catch(e => {throw e});
+  isAppointmentSet = true;
   Render.Sections.home();
-
+  notyf.success('התור שלך נרשם בהצלחה!');
 }
 function setHour(){
   const sect = sections.chooseTime;

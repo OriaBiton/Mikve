@@ -4,6 +4,10 @@ class Render {
     Render.listMikvaot();
     Render.setScheduleTable();
   }
+  static showSetAppartmentButton(){
+    hide(byId('my-appointment'));
+    unhide(byId('set-appointment-btn'));
+  }
   static async h1Background(){
     const h1s = qAll('h1');
     const svg = await (await fetch('../../images/h1bg.svg')).text();
@@ -136,31 +140,30 @@ Render.Sections = class Sections {
     else Render.Sections.login();
     hide(loading);
   }
-  static loading(){
-    hide(getActiveSection());
-    unhide(byId('loading'));
+  static loading(isOn){
+    const loading = byId('loading');
+    if (isOn) return on();
+    off();
+
+    function on(){
+      lastActiveSection = getActiveSection();
+      hide(lastActiveSection);
+      unhide(loading);
+    }
+    function off(){
+      hide(loading);
+      unhide(lastActiveSection);
+    }
   }
   static confirm(e){
     e.preventDefault();
-    fillDescriptions();
+    addTable();
     Render.Sections.activate('confirm');
 
-    function fillDescriptions(){
-      mikve();
-      time();
-
-      function time(){
-        const d = selectedTime.date;
-        const txt = `${d.hebDay} ב${d.hebMonth}
-          ${d.gregDay} ב${d.gregMonthString} ${d.gregYear}
-          בשעה ${selectedTime.hour.text}`;
-        byId('confirm-time-desc').innerText = txt;
-      }
-      function mikve(){
-        const txt = `"${selectedMikve.name}"
-          ${selectedMikve.address}, בת ים`;
-        byId('confirm-mikve-desc').innerText = txt;
-      }
+    function addTable(){
+      const div = byId('confirm-appointment-table');
+      const table = new AppointmentTable();
+      div.appendChild(table);
     }
   }
 
@@ -238,23 +241,22 @@ Render.Sections = class Sections {
     Render.Sections.activate('home');
 
     async function renderAppointment(){
-      await getAppointment();
-      showAppointment();
+      const btn = byId('set-appointment-btn');
+      if (!(await getAppointmentGlobalVars())) return unhide(btn);
+      const table = new AppointmentTable(true);
+      const div = byId('my-appointment');
+      div.appendChild(table);
+      hide(btn);
+      unhide(div);
 
-      function showAppointment(){
-        const table = new AppointmentTable(true);
-        const div = byId('my-appointment');
-        const btn = byId('set-appointment-btn');
-        div.appendChild(table);
-        hide(btn);
-        unhide(div);
-      }
-      async function getAppointment(){
-        if (selectedMikve && selectedTime) return false;
+      async function getAppointmentGlobalVars(){
+        if (selectedMikve && selectedTime && isAppointmentSet) return true;
         const data = await getData();
         if (!data) return false;
         selectedMikve = data.mikve;
         selectedTime = data.time;
+        isAppointmentSet = true;
+        return true;
 
         async function getData(){
           const uid = Auth.getUser().uid;

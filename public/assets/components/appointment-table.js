@@ -24,12 +24,18 @@ class AppointmentTable extends HTMLElement {
     this.deletable = deletable;
   }
   connectedCallback(){
+    const dataset = this.closest('section').dataset;
+    if (dataset.connectedAppointmentTable) this.overwrite();
     this.innerHTML = appointmentTableTemplate;
     this.fillDescriptions();
     if (this.deletable) this.addDeleteButton();
     this.addListeners();
+    dataset.connectedAppointmentTable = true;
   }
-
+  overwrite(){
+    const first = this.closest('section').querySelector('appointment-table');
+    first.removeSelf();
+  }
   addDeleteButton(){
     const th = this.querySelector('.actions');
     const td = this.querySelector('.delete-btn');
@@ -55,7 +61,18 @@ class AppointmentTable extends HTMLElement {
     }
   }
   addListeners(){
-    this.querySelector('.delete-btn button').addEventListener('click', deleteAppointment);
+    this.querySelector('.delete-btn button').addEventListener('click', this.delete);
+  }
+  delete(){
+    const dataset = this.closest('section').dataset;
+    dataset.connectedAppointmentTable = '';
+    deleteAppointment();
+    this.closest('appointment-table').remove();
+  }
+  removeSelf(){
+    const dataset = this.closest('section').dataset;
+    dataset.connectedAppointmentTable = '';
+    this.remove();
   }
 }
 
