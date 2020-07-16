@@ -68,6 +68,7 @@ section {
 	from {opacity: 0;transform: translateY(50px)}
   to {opacity: 1; transform: translateY(0)}
 }
+[data-admin-ui]{display: none;}
 h1 {
 	font-size: 4rem;
 	color: var(--brightest);
@@ -182,24 +183,13 @@ mikve-card.active{
   animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
 }
 
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
+@keyframes stroke {100% {stroke-dashoffset: 0;}}
 @keyframes scale {
-  0%, 100% {
-    transform: none;
-  }
-  50% {
-    transform: scale3d(1.1, 1.1, 1);
-  }
+  0%, 100% {transform: none;}
+  50% {transform: scale3d(1.1, 1.1, 1);}
 }
 @keyframes fill {
-  100% {
-    box-shadow: inset 0px 0px 0px 30px var(--good);
-		/* maybe --primary? */
-  }
+  100% {box-shadow: inset 0px 0px 0px 30px var(--good);/* maybe --primary? */}
 }
 .stars{
 	min-width: 120px;
@@ -290,41 +280,6 @@ table span {font-size: 2rem;}
 	position: absolute;
 	cursor: pointer;
 }
-.modal h1 {font-size: 2rem; margin: 0;}
-.modal {
-	display: none;
-	position: fixed;
-	z-index: 2;
-	padding-top: 100px;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
-	background-color: rgba(0, 0, 0, .4);
-	margin: 0;
-	animation: fadeIn .3s;
-}
-.modal-content {
-	position: relative;
-	background-color: var(--brightest);
-	margin: auto;
-	padding: 0;
-	border: 1px solid #888;
-	width: calc(var(--sectionW) * .7);
-	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19);
-	animation: fromTop .4s;
-	border-radius: 5px;
-	padding-bottom: 1rem;
-}
-.modal .close{color: var(--brightest)}
-.modal .close:hover{color: var(--darkest)}
-.modal-body{padding:2px 16px}
-.modal ul, .modal ol{
-	max-height: 25rem; overflow-y: auto
-}
-.modal li{margin-bottom: 2rem}
-.modal li p{margin: 0; color: var(--darkest)}
 h3{font-size:2.3rem}
 h4{font-size:22px;font-weight:100}
 .w-80p{width:80%}

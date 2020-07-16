@@ -82,13 +82,11 @@
 			<div class="p-side-3">
 				<h2 id="greeting"></h2>
 				<div class="middle">
-					<div id="my-appointment" class="hidden" data-client-ui>
+					<div id="my-appointment" class="hidden">
 						<h2>📍 התור הבא שלך:</h2>
 					</div>
 					<button id="set-appointment-btn">לקביעת תור</button>
-					<a href="https://mdby.org.il/mikve" target="_blank" data-client-ui>
-						<button class="secondary">מידע נוסף / מחלקת מקוואות</button>
-					</a>
+					<button id="more-info-btn" class="secondary">מידע נוסף / מחלקת מקוואות</button>
 				</div>
 				<div class="flex">
 					<img src="images/phone.png" title="התקשרו למחלקת מקוואות" class="pointer">
@@ -156,16 +154,6 @@
 				</span>
 				<h2>🎯 אנא ודאי שפרטי התור שלך נכונים:</h2>
 				<div id="confirm-appointment-table"></div>
-				<form class="mb-2" data-admin-ui>
-					<div class="field">
-						<label for="admin-appointment-name-input">שם הרוחצת:</label>
-						<input type="text" id="admin-appointment-name-input">
-					</div>
-					<div class="field">
-						<label for="admin-appointment-phone-input">מספר טלפון:</label>
-						<input type="phone" id="admin-appointment-phone-input">
-					</div>
-				</form>
 				<button id="confirm-btn">אישור תור</button>
 			</div>
 
@@ -183,6 +171,21 @@
 							<h2>שינוי שם</h2>
 							<label for="new-name">שם מלא:</label>
 							<input type="text" id="new-name" class="w-80p">
+						</div>
+						<div class="field">
+							<h2>שינוי סיסמה</h2>
+							<label for="new-pass">סיסמה חדשה:</label>
+							<input type="password" id="new-pass" class="w-80p">
+						</div>
+						<div class="field">
+							<h2>שינוי/הוספת כתובת</h2>
+							<label for="change-address">מעבר לרשימת הכתובות - לשינוי או להוספת בניין אחר.</label>
+							<button id="change-address" class="small-btn">חזור לבחירת כתובת</button>
+						</div>
+						<div class="field">
+							<h2>הסתרת פרטי התקשרות</h2>
+							<input id="hide-contact" type="checkbox" value="הסתר">
+							<label for="hide-contact" class="inline">הסתר את פרטי ההתקשרות אליי.</label>
 						</div>
 						<div class="field">
 							<h2>יציאה מהחשבון</h2>

@@ -39,7 +39,6 @@ class Listeners {
     byId('settings-btn').addEventListener('click', Render.Sections.settings);
     byId('cancel-settings').addEventListener('click', Render.Sections.settings);
     q('#settings form').addEventListener('submit', applySettings);
-    byId('change-address').addEventListener('click', Render.Sections.address);
   }
 
   static bindModalBySelectors(btns, modal){

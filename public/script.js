@@ -16,12 +16,12 @@ Hebcal.defaultCity = 'Jerusalem';
 // Invokations
 if (isMobile) setMobileNav();
 Listeners.addAllDocumentListeners();
-Render.fullRender();
+Render.setUI();
 //serviceWorker();
 
 // Function Definitions
 async function deleteAppointment(){
-  Render.Sections.loading(true);
+  Render.loading(true);
   const del = functions.httpsCallable('deleteAppointment');
   const obj = {time: selectedTime, mikve: selectedMikve};
   const data = {
@@ -31,7 +31,7 @@ async function deleteAppointment(){
   };
   await del(data).catch(e => {throw e});
   resetUI();
-  Render.Sections.loading();
+  Render.loading();
 
   function resetUI(){
     isAppointmentSet = false;
@@ -47,7 +47,7 @@ async function deleteAppointment(){
   }
 }
 async function setAppointment(){
-  Render.Sections.loading(true);
+  Render.loading(true);
   const set = functions.httpsCallable('setAppointment');
   const obj = {time: selectedTime, mikve: selectedMikve};
   const data = {
@@ -244,17 +244,9 @@ function getSections(){
 async function applySettings(e){
   e.preventDefault();
   const form = this;
-  const newPass = getVal('new-pass');
   const newName = getVal('new-name');
-  const hideContactChecked = isChecked('hide-contact');
-  const hideContactChanged = hideContactChecked != hideContact;
   const user = Auth.getUser();
-  let success;
-  if (newPass) success = await Auth.updatePassword(user, newPass);
-  if (newName) success = await Auth.setName(user, newName);
-  if (hideContactChanged) success = await toggleHideContact(user, hideContactChecked);
-  if (!success) return;
-  nullVal('new-pass');
+  if (newName) await Auth.setName(user, newName);
   nullVal('new-name');
   Render.Sections.settings();
   notyf.success('השינויים בוצעו בהצלחה.');
@@ -264,9 +256,6 @@ async function applySettings(e){
   }
   function nullVal(id){
     form.querySelector('#' + id).value = null;
-  }
-  function isChecked(id){
-    return form.querySelector('#' + id).checked;
   }
 }
 function onSignInSubmit(e){

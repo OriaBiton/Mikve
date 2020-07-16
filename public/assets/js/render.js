@@ -1,8 +1,19 @@
 class Render {
-  static fullRender(){
+  static setUI(){
     Render.h1Background();
     Render.listMikvaot();
     Render.setScheduleTable();
+  }
+  static async setAdminUI(user, isRetry){
+    const idTokenResult = await user.getIdTokenResult(true);
+    if (!idTokenResult.claims.admin){
+      console.log('not admin');
+      if (!isRetry) setTimeout(() => Render.setAdminUI(user, true), 5000);
+      return;
+    }
+    qAll('[data-admin-ui]').forEach(el => el.style.display = 'initial');
+    qAll('[data-client-ui]').forEach(el => el.style.display = 'none');
+    console.log('admin!');
   }
   static showSetAppartmentButton(){
     hide(byId('my-appointment'));
@@ -130,16 +141,6 @@ class Render {
       return letters[--n];
     }
   }
-}
-
-Render.Sections = class Sections {
-  static async renderSections(){
-    const loading = byId('loading');
-    const user = Auth.getUser();
-    if (user) await Render.Sections.home();
-    else Render.Sections.login();
-    hide(loading);
-  }
   static loading(isOn){
     const loading = byId('loading');
     if (isOn) return on();
@@ -154,6 +155,18 @@ Render.Sections = class Sections {
       hide(loading);
       unhide(lastActiveSection);
     }
+  }
+}
+
+Render.Sections = class Sections {
+  static async first(user){
+    const loading = byId('loading');
+    if (user) {
+      Render.setAdminUI(user);
+      await Render.Sections.home();
+    }
+    else Render.Sections.login();
+    hide(loading);
   }
   static confirm(e){
     e.preventDefault();

@@ -1,4 +1,5 @@
-firebase.auth().languageCode = 'he';
+const auth = firebase.auth();
+auth.languageCode = 'he';
 window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('signup-submit', {
   size: 'invisible',
   callback: response => {
@@ -7,17 +8,21 @@ window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('signup-submit', 
     onSignInSubmit();
   }
 });
-firebase.auth().onAuthStateChanged(user => {
-  if (user) console.log('Welcome, ' + user.displayName);
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const name = Auth.userName;
+    await Auth.setName(user, name, true);
+    console.log('Welcome, ' + name);
+  }
   else console.log('No user is signed in.');
-  Render.Sections.renderSections();
+  Render.Sections.first(user);
 });
 
 class Auth {
 
   static sendSmsCode(phone){
     const appVerifier = window.recaptchaVerifier;
-    firebase.auth().signInWithPhoneNumber(phone, appVerifier)
+    auth.signInWithPhoneNumber(phone, appVerifier)
     .then(confirmationResult => {
       // SMS sent. Prompt user to type the code from the message, then sign the
       // user in with confirmationResult.confirm(code).
@@ -31,12 +36,11 @@ class Auth {
   }
 
   static async registerUser(name, phone){
+    Auth.userName = name;
     const code = byId('sms-code').value;
     const result = await confirmationResult.confirm(code)
       .catch(e => Auth.showErrors(e));
     // User signed in successfully.
-    await Auth.setName(result.user, name, true)
-      .catch(e => { throw e });
     return result.user;
   }
 
@@ -44,23 +48,23 @@ class Auth {
     const user = Auth.getUser();
     if (!user){console.log('no one is logged in!'); return;}
     const name = user.displayName;
-    firebase.auth().signOut().then(() =>
+    auth.signOut().then(() =>
       console.log(name + ' logged out.'))
       .catch(err => Auth.showErrors(err));
     location.reload();
   }
 
   static getUser(){
-    return firebase.auth().currentUser;
+    return auth.currentUser;
   }
 
   static async setName(u, n, notDb){
     await u.updateProfile({ displayName: n })
     .catch(err => { Auth.showErrors(err); throw err; });
     console.log('The name is: ' + u.displayName);
-    if (notDb) return;
-    await Database.changeUserName(u.uid, u.displayName);
-    return true;
+    // if (notDb) return;
+    // await Database.changeUserName(u.uid, u.displayName);
+    // return true;
   }
 
   static authProvider(){return Auth.getUser().providerData[0].providerId;}
