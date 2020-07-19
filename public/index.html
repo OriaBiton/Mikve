@@ -86,11 +86,12 @@
 						<h2>📍 התור הבא שלך:</h2>
 					</div>
 					<button id="set-appointment-btn">לקביעת תור</button>
+					<button id="show-appointments-btn" class="secondary" data-admin-ui>רשימת תורים</button>
 					<a href="https://mdby.org.il/mikve" target="_blank" data-client-ui>
 						<button class="secondary">מידע נוסף / מחלקת מקוואות</button>
 					</a>
 				</div>
-				<div class="flex">
+				<div class="flex" data-client-ui>
 					<img src="images/phone.png" title="התקשרו למחלקת מקוואות" class="pointer">
 					<img src="images/whatsapp.png" title="ווצאפ מחלקת מקוואות" class="pointer">
 				</div>
@@ -159,16 +160,47 @@
 				<form class="mb-2" data-admin-ui>
 					<div class="field">
 						<label for="admin-appointment-name-input">שם הרוחצת:</label>
-						<input type="text" id="admin-appointment-name-input">
+						<input type="text" id="admin-appointment-name-input" required>
 					</div>
 					<div class="field">
 						<label for="admin-appointment-phone-input">מספר טלפון:</label>
-						<input type="phone" id="admin-appointment-phone-input">
+						<input type="phone" id="admin-appointment-phone-input" required>
 					</div>
 				</form>
 				<button id="confirm-btn">אישור תור</button>
 			</div>
 
+		</section>
+
+		<section id="appointments" class="hidden">
+			<h1>רשימת תורים</h1>
+			<div class="p-side-3 pos-rel">
+				<span class="back" onclick="Render.Sections.home(event)" title="חזרה לדף הבית">
+					➜
+				</span>
+				<div class="to-hide">
+					<h2>בחרי מקווה</h2>
+					<div class="mikve-cards"></div>
+				</div>
+				<div class="flex apart">
+					<input type="number" name="load-appointments-date" data-part="year">
+					<input type="number" name="load-appointments-date" data-part="month">
+					<input type="number" name="load-appointments-date" data-part="day">
+				</div>
+				<button id="load-appointment-list-btn">טעינת רשימה</button>
+				<table>
+					<thead>
+						<tr>
+							<th>שעה</th>
+							<th>שם</th>
+							<th>טלפון</th>
+							<th>סימון</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+
+			</div>
 		</section>
 
 		<section id="settings" class="hidden">

@@ -4,16 +4,79 @@ class Render {
     Render.listMikvaot();
     Render.setScheduleTable();
   }
-  static async setAdminUI(user, isRetry){
-    const idTokenResult = await user.getIdTokenResult(true);
-    if (!idTokenResult.claims.admin){
-      console.log('not admin');
-      if (!isRetry) setTimeout(() => Render.setAdminUI(user, true), 5000);
-      return;
+  static adminAppointmentList(snap){
+    const sect = sections.appointments;
+    const tbody = sect.querySelector('tbody');
+    const loadBtn = sect.querySelector('#load-appointment-list-btn');
+    const hours = snap.val();
+    const checked = getCheckedHours();
+    hide(sect.querySelector('.to-hide'));
+    tbody.innerHTML = null;
+    loadBtn.disabled = true;
+
+    for (const hour in hours) {
+      const ap = hours[hour];
+      const tr = document.createElement('tr');
+      addTd(Format.addColon(hour));
+      addTd(ap.name);
+      addTd(ap.phone);
+      addTd(null, `<input type="checkbox" class="big-checkbox"></input>`);
+      tbody.appendChild(tr);
+
+      function addTd(txt, html){
+        const td = document.createElement('td');
+        if (html) td.innerHTML = html;
+        if (txt) td.innerText = txt;
+        tr.appendChild(td);
+      }
     }
+    recheck(checked);
+
+    function recheck(hours){
+      for (const tr of tbody.rows) {
+        const box = tr.querySelector('input');
+        const hour = tr.cells[0].innerText;
+        if (hours.includes(hour)) box.checked = true;
+      }
+    }
+    function getCheckedHours(){
+      const checked = [];
+      for (const tr of tbody.rows) {
+        const box = tr.querySelector('input');
+        if (box.checked) checked.push(tr.cells[0].innerText);
+      }
+      return checked;
+    }
+  }
+  static async setAdminUI(user, isRetry){
+    await setGlobalVar();
+    if (!isAdmin) return;
     qAll('[data-admin-ui]').forEach(el => el.style.display = 'initial');
     qAll('[data-client-ui]').forEach(el => el.style.display = 'none');
-    console.log('admin!');
+
+    async function setGlobalVar(){
+      const byStorage = localStorage.getItem('isAdmin');
+      if (byStorage == user.uid + ':false') {
+        isAdmin = false; return;
+      }
+      else if (byStorage == user.uid + ':true'){
+        isAdmin = true; return;
+      }
+      const idTokenResult = await user.getIdTokenResult(true);
+      if (idTokenResult.claims.admin){
+        localStorage.setItem('isAdmin', user.uid + ':true');
+        isAdmin = true;
+        console.log('admin!');
+      }
+      else {
+        console.log('not admin');
+        isAdmin = false;
+        if (!isRetry) setTimeout(() => {
+          Render.setAdminUI(user, true);
+          localStorage.setItem('isAdmin', user.uid + ':false');
+        }, 5000);
+      }
+    }
   }
   static showSetAppartmentButton(){
     hide(byId('my-appointment'));
@@ -43,13 +106,14 @@ class Render {
     }
   }
   static listMikvaot(){
-    const sect = sections.chooseMikve;
-    const cardsDiv = sect.querySelector('.mikve-cards');
+    const cardsDivs = byClass('mikve-cards');
     Database.getMikvaot().then(s => s.forEach(addCard));
 
     function addCard(m){
-      const card = new MikveCard(m);
-      cardsDiv.appendChild(card);
+      for (const div of cardsDivs){
+        const card = new MikveCard(m);
+        div.appendChild(card);
+      }
     }
   }
   static setScheduleTable(){
@@ -75,7 +139,8 @@ class Render {
         const holidays = hDate.holidays();
         const td = document.createElement('td');
 
-        td.classList.add('date')
+        td.classList.add('date');
+        td.dataset.time = greg.getTime();
         td.dataset.hebDay = gematriya(hDate.day);
         td.dataset.hebMonth = hDate.getMonthName('h');
         td.dataset.gregDay = gregDay;
@@ -168,6 +233,23 @@ Render.Sections = class Sections {
     else Render.Sections.login();
     hide(loading);
   }
+  static appointments(e){
+    e.preventDefault();
+    setDateValues();
+
+    Render.Sections.activate('appointments');
+
+    function setDateValues(){
+      const inputs = qAll('input[name="load-appointments-date"]');
+      const date = new Date();
+      for (const i of inputs) {
+        const part = i.dataset.part;
+        if (part == 'day') i.value = date.getDate();
+        else if (part == 'month') i.value = date.getMonth() + 1;
+        else if (part == 'year') i.value = date.getFullYear();
+      }
+    }
+  }
   static confirm(e){
     e.preventDefault();
     addTable();
@@ -190,8 +272,10 @@ Render.Sections = class Sections {
       const getTakenHours = functions.httpsCallable('getTakenHours');
       const mikveName = selectedMikve.key;
       const ranges = getRanges(mikveName);
-      const taken = (await getTakenHours({mikveName})).data;
       const allowed = sect.querySelectorAll('td.allowed');
+      const datasetsOfAllowed = Array.from(allowed).map(a => a.dataset);
+      const takenPayload = {mikveName, dates: datasetsOfAllowed};
+      const taken = (await getTakenHours(takenPayload)).data;
       for (const td of allowed) {
         let hours;
         const dayData = td.dataset;
@@ -254,6 +338,7 @@ Render.Sections = class Sections {
     Render.Sections.activate('home');
 
     async function renderAppointment(){
+      if (isAdmin) return;
       const btn = byId('set-appointment-btn');
       if (!(await getAppointmentGlobalVars())) return unhide(btn);
       const table = new AppointmentTable(true);

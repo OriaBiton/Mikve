@@ -5,19 +5,25 @@ exports.fn = functions.region('europe-west3').https
   .onCall(async (data, context) => {
   const db = admin.database();
   const uid = context.auth.uid;
-  const phone = context.auth.token.phone_number;
+  const isAdmin = await checkAdmin();
+  const userName = isAdmin ?
+    data.admin.forName : context.auth.token.name;
+  const phone = isAdmin ?
+    data.admin.forPhone : context.auth.token.phone_number;
   const mikveName = data.mikveName;
-  const day = data.day;
-  const month = data.month;
-  const year = data.year;
-  const hour = data.hour;
+  const time = new Date(data.time);
+  const day = time.getDate();
+  const month = time.getMonth() + 1;
+  const year = time.getFullYear();
+  const hour = data.hour; //value, not text - '0000'
   const key = generateAppointmentKey();
   const maxAppointments = 1;
-  const path = `appointments/${mikveName}/${day}/${hour}`;
+  const path = `appointments/${mikveName}/${year}/${month}/${day}/${hour}`;
+  if (isInThePast()) error('Appointment cannot be set to the past.');
   if (!(await isUserAllowed())) error('Not allowed to set.');
   if (await isTaken()) error('Time already taken.');
   setInAppointments();
-  setInUser();
+  if (!isAdmin) setInUser();
 
   function setInUser(){
     const appointment = {
@@ -30,16 +36,23 @@ exports.fn = functions.region('europe-west3').https
   }
   function setInAppointments(){
     const appointment = {
-      uid, phone, key, name: context.auth.token.name
+      uid, phone, key, name: userName, setByAdmin: isAdmin
     };
     db.ref(path).set(appointment).catch(e => {throw e});
   }
+  async function checkAdmin(){
+    const claims = (await admin.auth().getUser(uid)).customClaims;
+    if (!claims || !claims.admin) return false;
+    if (claims.admin) return true;
+  }
+  function isInThePast(){ return new Date() > time }
   async function isTaken(){
     let taken;
     await db.ref(path).once('value', snap => taken = snap.exists());
     return taken;
   }
   async function isUserAllowed(){
+    if (isAdmin) return true;
     let allowed;
     await db.ref(`users/${uid}/appointments`).once('value', snap =>
       allowed = snap.numChildren() < maxAppointments);

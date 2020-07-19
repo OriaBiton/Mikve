@@ -6,9 +6,12 @@ exports.fn = functions.region('europe-west3').https
   const db = admin.database();
   const uid = context.auth.uid;
   const mikveName = data.mikveName;
-  const day = data.day;
+  const time = new Date(data.time);
+  const year = time.getFullYear();
+  const month = time.getMonth() + 1;
+  const day = time.getDate();
   const hour = data.hour;
-  const path = `appointments/${mikveName}/${day}/${hour}`;
+  const path = `appointments/${mikveName}/${year}/${month}/${day}/${hour}`;
   remove();
 
   async function remove(){

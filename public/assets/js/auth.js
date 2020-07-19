@@ -10,9 +10,11 @@ window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('signup-submit', 
 });
 auth.onAuthStateChanged(async user => {
   if (user) {
-    const name = Auth.userName;
-    await Auth.setName(user, name, true);
-    console.log('Welcome, ' + name);
+    if (!user.displayName) {
+      const name = Auth.userName;
+      await Auth.setName(user, name, true);
+    }
+    console.log('Welcome, ' + user.displayName);
   }
   else console.log('No user is signed in.');
   Render.Sections.first(user);

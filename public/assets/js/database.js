@@ -1,10 +1,15 @@
 class Database {
 
+  static async bindAppointmentList(name, date){
+    if (Database.appointmentListRef) Database.appointmentListRef.off('value');
+    const path = `appointments/${name}/${date.year}/${date.month}/${date.day}`;
+    Database.appointmentListRef = db.ref(path);
+    await db.ref(path).on('value', Render.adminAppointmentList);
+  }
   static async getMikvaot(){
     let s;
-    await firebase.database().ref('mikvaot').once('value', snap => {
-      s = snap;
-    });
+    await firebase.database().ref('mikvaot')
+      .once('value', snap => s = snap);
     return s;
   }
   static setPushSubscription(uid, sub){

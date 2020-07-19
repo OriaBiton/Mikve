@@ -2,6 +2,7 @@
 // Globals
 var lastActiveSection;
 var subscribedToPush;
+var isAdmin;
 var selectedMikve;
 var selectedTime = {};
 var isAppointmentSet;
@@ -20,13 +21,33 @@ Render.setUI();
 //serviceWorker();
 
 // Function Definitions
+function enableLoadappointmentListBtn(){
+  byId('load-appointment-list-btn').disabled = false;
+}
+async function loadAppointments(){
+  Render.loading(true);
+  const name = selectedMikve.key;
+  const date = getDate();
+  await Database.bindAppointmentList(name, date);
+  Render.loading();
+  notyf.success('הרשימה נטענה בהצלחה ותתעדכן בעמוד אוטומטית');
+
+  function getDate(){
+    const obj = {};
+    const dateInputs = qAll('input[name="load-appointments-date"]');
+    for (const i of dateInputs) {
+      const part = i.dataset.part;
+      obj[part] = i.value;
+    }
+    return obj;
+  }
+}
 async function deleteAppointment(){
   Render.loading(true);
   const del = functions.httpsCallable('deleteAppointment');
-  const obj = {time: selectedTime, mikve: selectedMikve};
   const data = {
     mikveName: selectedMikve.key,
-    day: selectedTime.date.gregDay,
+    time: getSelectedTime(),
     hour: selectedTime.hour.value
   };
   await del(data).catch(e => {throw e});
@@ -50,18 +71,26 @@ async function setAppointment(){
   Render.loading(true);
   const set = functions.httpsCallable('setAppointment');
   const obj = {time: selectedTime, mikve: selectedMikve};
+  const adminObj = {
+    forName: byId('admin-appointment-name-input').value,
+    forPhone: byId('admin-appointment-phone-input').value
+  };
   const data = {
     mikveName: selectedMikve.key,
-    day: selectedTime.date.gregDay,
+    time: getSelectedTime(),
     hour: selectedTime.hour.value,
-    month: selectedTime.date.gregMonthInt,
-    year: selectedTime.date.gregYear,
-    obj: JSON.stringify(obj)
+    obj: JSON.stringify(obj),
+    admin: isAdmin ? adminObj : null
   };
   await set(data).catch(e => {throw e});
   isAppointmentSet = true;
   Render.Sections.home();
   notyf.success('התור שלך נרשם בהצלחה!');
+}
+function getSelectedTime(){
+  const d = selectedTime.date;
+  const h = selectedTime.hour;
+  return new Date(`${d.gregYear}-${d.gregMonthInt}-${d.gregDay} ${h.text}`).getTime();
 }
 function setHour(){
   const sect = sections.chooseTime;
@@ -140,7 +169,7 @@ function setDate(e){
       for (const hour of allowedHours) {
         const opt = document.createElement('option');
         opt.value = hour;
-        opt.innerText = hour.slice(0, 2) + ':' + hour.slice(2);
+        opt.innerText = Format.addColon(hour);
         select.add(opt);
       }
     }
@@ -238,6 +267,7 @@ function getSections(){
     chooseMikve: byId('choose-mikve'),
     chooseTime: byId('choose-time'),
     confirm: byId('confirm'),
+    appointments: byId('appointments'),
     settings: byId('settings')
   };
 }

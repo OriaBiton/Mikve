@@ -121,6 +121,7 @@ input[type="checkbox"], input[type="radio"]{
 	width: initial;
 	min-height: initial;
 }
+input[name="load-appointments-date"]{max-width: 30%}
 ::placeholder {opacity: .3}
 label {
 	font-size: 1.5rem;
@@ -134,6 +135,7 @@ label {
 	display: flex;
 	-webkit-overflow-scrolling: touch;
 	-moz-overflow-scrolling: touch;
+	margin-bottom: 2rem;
 }
 .card{
   margin: 1rem;
@@ -182,8 +184,38 @@ mikve-card.active{
   stroke-dashoffset: 48;
   animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
 }
+table .checkmark {top: 0; right: 1.5rem;}
+.big-checkbox {
+	appearance: none;
+	-webkit-appearance: none;
+	background-color: #fafafa;
+	border: 1px solid #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 18px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+	transition: background-color .25s;
+}
+.big-checkbox:active, .big-checkbox:checked:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+.big-checkbox:checked{background-color: var(--bg-color)}
+.big-checkbox:checked:after {
+	content: '\2714';
+	font-size: 2.8rem;
+	position: absolute;
+	top: 0px;
+	left: 6px;
+	color: var(--color2);
+	animation: checkGrow .25s;
+}
 
 @keyframes stroke {100% {stroke-dashoffset: 0;}}
+@keyframes checkGrow{
+	0%{font-size: 0}
+	100%{font-size: 2.8rem}
+}
 @keyframes scale {
   0%, 100% {transform: none;}
   50% {transform: scale3d(1.1, 1.1, 1);}
@@ -289,11 +321,14 @@ h4{font-size:22px;font-weight:100}
 	flex-wrap: wrap;
 	justify-content: space-around;
 }
+.apart{justify-content: space-between;}
 .small-btn, table button{
 	font-size:1.7rem;
 	margin:1.7rem 0;
-	background: var(--secondary)
+	background: var(--secondary);
+	width: unset;
 }
+button.active{background-color: var(--color2)}
 .mxh-40{max-height: 40rem; overflow-y: auto;}
 .bold{font-weight: bold}
 .faded{opacity: .6}

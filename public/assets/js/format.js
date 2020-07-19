@@ -1,4 +1,7 @@
 class Format {
+  static addColon(s){
+    return s.slice(0, 2) + ':' + s.slice(2);
+  }
   static toWeekday(n){
     const weekdays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
     return weekdays[n];

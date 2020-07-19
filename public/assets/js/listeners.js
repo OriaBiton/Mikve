@@ -7,6 +7,7 @@ class Listeners {
     Listeners.addListenersToChooseTimeSection();
     Listeners.addListenersToConfirmSection();
     Listeners.addListenersToSettingsSection();
+    Listeners.addListenersToAppointmentsSection();
     // window.onbeforeunload = function() {
     //   return "בטוחים שברצונכם לצאת מהאפליקציה?"};
   }
@@ -21,6 +22,7 @@ class Listeners {
 
   static addListenersToHomeSection(){
     byId('set-appointment-btn').addEventListener('click', Render.Sections.chooseMikve);
+    byId('show-appointments-btn').addEventListener('click', Render.Sections.appointments);
   }
 
   static addListenersToChooseMikveSection(){
@@ -34,6 +36,11 @@ class Listeners {
   }
   static addListenersToConfirmSection(){
     byId('confirm-btn').addEventListener('click', setAppointment);
+  }
+  static addListenersToAppointmentsSection(){
+    byId('load-appointment-list-btn').addEventListener('click', loadAppointments);
+    qAll('[name="load-appointments-date"]').forEach(i =>
+      i.addEventListener('change', enableLoadappointmentListBtn));
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);
