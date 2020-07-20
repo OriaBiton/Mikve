@@ -128,71 +128,72 @@ class Render {
     for (let i = 0; i < visibleWeeks; i++) {
       const tr = document.createElement('tr');
       for (let j = 0; j < 7; j++) {
-        const greg = hDate.greg();
-        const dayOfWeek = greg.getDay();
-        const gregDay = greg.getDate();
-        const gregMonthInt = greg.getMonth() + 1;
-        const gregMonthString = greg.toLocaleString('he', { month: 'long' });
-        const isToday = gregDay == new Date().getDate();
-        const isFirstInHebMonth = hDate.day === 1;
-        const isFirstInGregMonth = gregDay === 1;
-        const holidays = hDate.holidays();
-        const td = document.createElement('td');
-
-        td.classList.add('date');
-        td.dataset.time = greg.getTime();
-        td.dataset.hebDay = gematriya(hDate.day);
-        td.dataset.hebMonth = hDate.getMonthName('h');
-        td.dataset.gregDay = gregDay;
-        td.dataset.gregMonthInt = gregMonthInt;
-        td.dataset.gregMonthString = gregMonthString;
-        td.dataset.gregYear = greg.getFullYear();
-        td.dataset.dayOfWeek = dayOfWeek;
-        td.dataset.sunset = getSunset(hDate);
-
-        td.innerHTML = `<span class="date-heb">${td.dataset.hebDay}</span>
-          <span class="date-greg hidden">${gregDay}</span>`;
-        if (isToday) {
-          td.classList.add('today');
-          isInThePast = false;
-        }
-        if (isFirstInHebMonth) td.classList.add('first-in-heb-month');
-        if (isFirstInGregMonth) td.classList.add('first-in-greg-month');
-        if (holidays.length && holidays[0].desc[2] != 'ראש חודש') {
-          td.classList.add('holiday');
-          td.dataset.holiday = holidays[0].desc[2]
-            .replace('שבת ', '').replace('צום ', '');
-        }
-        if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
-          td.classList.add('allowed');
-          td.addEventListener('click', setDate);
-          daysToTheFuture++;
-          addShabbat();
-
-          function addShabbat(){
-            let time;
-            let timeName;
-            const candles = hDate.candleLighting();
-            const havdala = hDate.havdalah();
-            if (candles) {
-              timeName = 'candles';
-              time = candles;
-            }
-            else if (havdala) {
-              timeName = 'havdala';
-              time = havdala;
-            }
-            else return;
-            td.dataset[timeName] = `${time.getHours()}:${time.getMinutes()}`;
-          }
-
-        }
+        const td = setTd();
         tr.appendChild(td);
         hDate = hDate.next();
       }
       tbody.appendChild(tr);
     }
 
+    function setTd(){
+      const greg = hDate.greg();
+      const dayOfWeek = greg.getDay();
+      const gregDay = greg.getDate();
+      const gregMonthInt = greg.getMonth() + 1;
+      const gregMonthString = greg.toLocaleString('he', { month: 'long' });
+      const isToday = gregDay == new Date().getDate();
+      const isFirstInHebMonth = hDate.day === 1;
+      const isFirstInGregMonth = gregDay === 1;
+      const holidays = hDate.holidays();
+      const td = document.createElement('td');
+      td.classList.add('date');
+      td.dataset.time = greg.getTime();
+      td.dataset.hebDay = gematriya(hDate.day);
+      td.dataset.hebMonth = hDate.getMonthName('h');
+      td.dataset.gregDay = gregDay;
+      td.dataset.gregMonthInt = gregMonthInt;
+      td.dataset.gregMonthString = gregMonthString;
+      td.dataset.gregYear = greg.getFullYear();
+      td.dataset.dayOfWeek = dayOfWeek;
+      td.dataset.sunset = getSunset(hDate);
+      td.innerHTML = `<span class="date-heb">${td.dataset.hebDay}</span>
+        <span class="date-greg hidden">${gregDay}</span>`;
+      if (isToday) {
+        td.classList.add('today');
+        isInThePast = false;
+      }
+      if (isFirstInHebMonth) td.classList.add('first-in-heb-month');
+      if (isFirstInGregMonth) td.classList.add('first-in-greg-month');
+      if (holidays.length && holidays[0].desc[2] != 'ראש חודש') {
+        td.classList.add('holiday');
+        td.dataset.holiday = holidays[0].desc[2]
+          .replace('שבת ', '').replace('צום ', '');
+      }
+      if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
+        td.classList.add('allowed');
+        td.addEventListener('click', setDate);
+        daysToTheFuture++;
+        addShabbat();
+      }
+      return td;
+
+      function addShabbat(){
+        let time;
+        let timeName;
+        const candles = hDate.candleLighting();
+        const havdala = hDate.havdalah();
+        if (candles) {
+          timeName = 'candles';
+          time = candles;
+        }
+        else if (havdala) {
+          timeName = 'havdala';
+          time = havdala;
+        }
+        else return;
+        td.dataset[timeName] = `${time.getHours()}:${time.getMinutes()}`;
+      }
+    }
     function getSunset(d){
       const eve = d.gregEve();
       return `${eve.getHours()}:${eve.getMinutes()}`;
@@ -213,10 +214,12 @@ class Render {
 
     function on(){
       lastActiveSection = getActiveSection();
+      if (!lastActiveSection) return; // none, so loader's probably visible.
       hide(lastActiveSection);
       unhide(loading);
     }
     function off(){
+      if (!lastActiveSection) return;
       hide(loading);
       unhide(lastActiveSection);
     }
@@ -278,6 +281,7 @@ Render.Sections = class Sections {
       const taken = (await getTakenHours(takenPayload)).data;
       for (const td of allowed) {
         let hours;
+        const isToday = td.hasClass('today');
         const dayData = td.dataset;
         const gregDay = dayData.gregDay;
         const candles = dayData.candles;
@@ -286,6 +290,7 @@ Render.Sections = class Sections {
         if (candles) dayType = 'friday';
         else if (havdala) dayType = 'saturday';
         hours = spread(ranges[dayType].from, ranges[dayType].until, dayData);
+        if (isToday) hours = removePastHours(hours);
         dayData.allowedHours = hours;
         if (taken[gregDay]) dayData.takenHours = taken[gregDay];
         td.dataset.ready = true;
@@ -293,6 +298,14 @@ Render.Sections = class Sections {
       }
       if (tdToClick) tdToClick.click();
 
+      function removePastHours(hours){
+        let now = new Date();
+        now = Format.to4Chars(now.getHours(), now.getMinutes());
+        for (let i = hours.length; i >= 0; i--) {
+          if (hours[i] < now) hours.splice(i, 1);
+        }
+        return hours;
+      }
       function getRanges(mikve){
         const card = q(`mikve-card[data-key="${mikve}"]`);
         return card.hours[getSeason()];
@@ -305,9 +318,9 @@ Render.Sections = class Sections {
       function spread(from, until, dayData){
         from = Format.toHourMinutesObject(from, dayData);
         until = Format.toHourMinutesObject(until, dayData);
-        const step = 5;
+        const step = 5; // Interval in minutes
         let iM = from.minutes;
-        let arr = [];
+        const arr = [];
         for (let iH = from.hour; iH <= until.hour; iH++) {
           while (iM < 60) {
             if (iH == until.hour && iM > until.minutes) break;

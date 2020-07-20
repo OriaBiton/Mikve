@@ -44,6 +44,7 @@ exports.fn = functions.region('europe-west3').https
     const claims = (await admin.auth().getUser(uid)).customClaims;
     if (!claims || !claims.admin) return false;
     if (claims.admin) return true;
+    else return false;
   }
   function isInThePast(){ return new Date() > time }
   async function isTaken(){

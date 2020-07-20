@@ -24,6 +24,7 @@ class AppointmentTable extends HTMLElement {
     this.deletable = deletable;
   }
   connectedCallback(){
+    if (this.hasPast()) return this.delete();
     const dataset = this.closest('section').dataset;
     if (dataset.connectedAppointmentTable) this.overwrite();
     this.innerHTML = appointmentTableTemplate;
@@ -32,6 +33,7 @@ class AppointmentTable extends HTMLElement {
     this.addListeners();
     dataset.connectedAppointmentTable = true;
   }
+  hasPast(){ return new Date() > selectedTime.date.time }
   overwrite(){
     const first = this.closest('section').querySelector('appointment-table');
     first.removeSelf();
@@ -39,7 +41,6 @@ class AppointmentTable extends HTMLElement {
   addDeleteButton(){
     const th = this.querySelector('.actions');
     const td = this.querySelector('.delete-btn');
-
     unhide(th);
     unhide(td);
   }
@@ -63,11 +64,10 @@ class AppointmentTable extends HTMLElement {
   addListeners(){
     this.querySelector('.delete-btn button').addEventListener('click', this.delete);
   }
-  delete(){
-    const dataset = this.closest('section').dataset;
-    dataset.connectedAppointmentTable = '';
+  delete(e){
     deleteAppointment();
-    this.closest('appointment-table').remove();
+    if (e) this.closest('appointment-table').removeSelf();
+    else this.removeSelf();
   }
   removeSelf(){
     const dataset = this.closest('section').dataset;
