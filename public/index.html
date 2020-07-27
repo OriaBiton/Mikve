@@ -96,6 +96,33 @@
 					<img src="images/whatsapp.png" title="ווצאפ מחלקת מקוואות" class="pointer">
 				</div>
 			</div>
+			<div class="modal" id="star-mikve-modal" data-client-ui>
+				<div class="modal-content">
+					<span class="close">×</span>
+					<div class="modal-header">
+						<h1>דירוג מקווה</h1>
+					</div>
+					<div class="modal-body">
+						<div id="star-mikve">
+							<p><strong></strong></p>
+							<div class="rate">
+								<input type="radio" id="rate-star5" name="rate-mikve" value="5">
+								<label for="rate-star5" title="5"></label>
+								<input type="radio" id="rate-star4" name="rate-mikve" value="4">
+								<label for="rate-star4" title="4"></label>
+								<input type="radio" id="rate-star3" name="rate-mikve" value="3" checked>
+								<label for="rate-star3" title="3"></label>
+								<input type="radio" id="rate-star2" name="rate-mikve" value="2">
+								<label for="rate-star2" title="2"></label>
+								<input type="radio" id="rate-star1" name="rate-mikve" value="1">
+								<label for="rate-star1" title="1"></label>
+							</div>
+							<button id="star-mikve-btn" class="small-btn">אישור</button>
+							<button id="dont-star-btn" class="small-btn danger">בפעם אחרת</button>
+						</div>
+					</div>
+				</div>
+			</div><!-- Modal -->
 		</section>
 
 		<section id="choose-mikve" class="hidden">
@@ -124,7 +151,7 @@
 					<input id="schedule-to-greg" type="radio" value="greg" name="schedule-type">
 					<label for="schedule-to-greg" class="inline">לועזי</label>
 				</div>
-				<table class="mb-2">
+				<table id="date-table" class="mb-2">
 					<thead>
 						<tr>
 							<th>ראשון</th>

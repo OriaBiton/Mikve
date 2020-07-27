@@ -1,7 +1,24 @@
 {
-  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
+  /* Wahh */
+
   "rules": {
-    ".read": true,
-    ".write": true
+    "admins": {
+      ".read": false,
+      ".write": false
+    },
+    "appointments": {
+      ".read": "auth.token.admin == true",
+      ".write": false
+    },
+    "mikvaot": {
+      ".read": true,
+      ".write": false
+    },
+    "users": {
+      "$uid": {
+        ".read": "$uid == auth.uid",
+        ".write": false
+      }
+    }
   }
 }

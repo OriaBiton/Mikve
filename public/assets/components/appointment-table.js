@@ -11,38 +11,52 @@ const appointmentTableTemplate = `
       <tr>
         <td class="mikve-desc"></td>
         <td class="time-desc"></td>
-        <td class="delete-btn hidden">
-          <button class="danger">מחיקה</button>
+        <td class="actions-td hidden">
+          <a class="waze-btn" target="_blank">
+            <button><img src="images/waze.png">ניווט</button>
+          </a>
+          <button class="danger delete-btn">מחיקה</button>
         </td>
       </tr>
     </tbody>
   </table>
 `;
 class AppointmentTable extends HTMLElement {
-  constructor(deletable){
+  constructor(hasActions){
     super();
-    this.deletable = deletable;
+    this.hasActions = hasActions;
+    this.hasPast = hasPast();
+    function hasPast(){ return new Date() > selectedTime.time }
   }
   connectedCallback(){
-    if (this.hasPast()) return this.delete();
+    if (this.hasPast) return this.delete();
     const dataset = this.closest('section').dataset;
     if (dataset.connectedAppointmentTable) this.overwrite();
     this.innerHTML = appointmentTableTemplate;
     this.fillDescriptions();
-    if (this.deletable) this.addDeleteButton();
-    this.addListeners();
+    if (this.hasActions) this.addActions();
     dataset.connectedAppointmentTable = true;
   }
-  hasPast(){ return new Date() > selectedTime.date.time }
   overwrite(){
     const first = this.closest('section').querySelector('appointment-table');
     first.removeSelf();
   }
-  addDeleteButton(){
+  addActions(){
     const th = this.querySelector('.actions');
-    const td = this.querySelector('.delete-btn');
+    const td = this.querySelector('.actions-td');
     unhide(th);
     unhide(td);
+    setWazeButton(this)
+    addListeners(this);
+
+    function setWazeButton(self){
+      const a = self.querySelector('.waze-btn');
+      const llParam = selectedMikve.waze;
+      a.href = `https://www.waze.com/ul?ll=${llParam}&navigate=yes`;
+    }
+    function addListeners(self){
+      self.querySelector('.delete-btn').addEventListener('click', self.delete);
+    }
   }
   fillDescriptions(){
     mikve(this);
@@ -61,17 +75,16 @@ class AppointmentTable extends HTMLElement {
       self.querySelector('.mikve-desc').innerText = txt;
     }
   }
-  addListeners(){
-    this.querySelector('.delete-btn button').addEventListener('click', this.delete);
-  }
   delete(e){
-    deleteAppointment();
+    byId('star-mikve-modal').dataset.key = selectedMikve.key;
+    deleteAppointment(e);
     if (e) this.closest('appointment-table').removeSelf();
     else this.removeSelf();
   }
   removeSelf(){
     const dataset = this.closest('section').dataset;
     dataset.connectedAppointmentTable = '';
+    if (this.hasPast) Render.askToStarMikve();
     this.remove();
   }
 }

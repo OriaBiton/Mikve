@@ -17,6 +17,7 @@ class MikveCard extends HTMLElement {
     this.img = mikve.img;
     this.rating = mikve.rating;
     this.hours = mikve.hours;
+    this.waze = mikve.waze;
     this.key = m.key;
   }
   connectedCallback(){

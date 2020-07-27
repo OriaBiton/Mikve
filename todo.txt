@@ -1,0 +1,8 @@
+לבטל בחירת יום אם נגמרו השעות הזמינות - למשל מאוחר בלילה
+Uncaught TypeError: o is null
+    disableTaken http://localhost:5000/script.js:184
+    fillHourSelect http://localhost:5000/script.js:176
+    setDate http://localhost:5000/script.js:161
+
+לבדוק אם כבר עבר הזמן ומותר לה לדרג את המקווה לפני שאני מציג
+את המודל.

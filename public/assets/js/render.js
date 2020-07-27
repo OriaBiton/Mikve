@@ -1,4 +1,18 @@
 class Render {
+  static closeAskToStar(e){
+    if (e) {
+      e.preventDefault();
+      e.target.closest('.modal').querySelector('.close').click();
+    }
+    else q('#star-mikve-modal .close').click();
+  }
+  static askToStarMikve(){
+    const modal = byId('star-mikve-modal');
+    const name = selectedMikve.name;
+    const desc = q('#star-mikve strong');
+    modal.style.display = 'initial';
+    desc.innerText = `את מוזמנת לדרג את מקווה "${name}" כדי שנדע להשתפר לעתיד:`;
+  }
   static setUI(){
     Render.h1Background();
     Render.listMikvaot();
@@ -147,7 +161,7 @@ class Render {
       const holidays = hDate.holidays();
       const td = document.createElement('td');
       td.classList.add('date');
-      td.dataset.time = greg.getTime();
+      //td.dataset.time = greg.getTime();
       td.dataset.hebDay = gematriya(hDate.day);
       td.dataset.hebMonth = hDate.getMonthName('h');
       td.dataset.gregDay = gregDay;

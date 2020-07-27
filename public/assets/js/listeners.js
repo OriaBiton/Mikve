@@ -8,6 +8,7 @@ class Listeners {
     Listeners.addListenersToConfirmSection();
     Listeners.addListenersToSettingsSection();
     Listeners.addListenersToAppointmentsSection();
+    Listeners.addModalCloseListeners();
     // window.onbeforeunload = function() {
     //   return "בטוחים שברצונכם לצאת מהאפליקציה?"};
   }
@@ -23,6 +24,8 @@ class Listeners {
   static addListenersToHomeSection(){
     byId('set-appointment-btn').addEventListener('click', Render.Sections.chooseMikve);
     byId('show-appointments-btn').addEventListener('click', Render.Sections.appointments);
+    byId('star-mikve-btn').addEventListener('click', starMikve);
+    byId('dont-star-btn').addEventListener('click', Render.closeAskToStar);
   }
 
   static addListenersToChooseMikveSection(){
@@ -47,20 +50,21 @@ class Listeners {
     byId('cancel-settings').addEventListener('click', Render.Sections.settings);
     q('#settings form').addEventListener('submit', applySettings);
   }
+  static addModalCloseListeners(){
+    const modals = byClass('modal');
+    for (const m of modals) bindModalBySelectors(m);
 
-  static bindModalBySelectors(btns, modal){
-    if (btns.length) for (const btn of btns)
-      btn.addEventListener('click', showModal);
-    else btns.addEventListener('click', showModal);
-    // When the user clicks anywhere outside of the box, close it
-    modal.addEventListener('click', closeModal);
+    function bindModalBySelectors(modal){
+      // When the user clicks anywhere outside of the box, close it
+      modal.addEventListener('click', closeModal);
 
-    function closeModal(event){
-      const closeBtn = modal.querySelector('.close');
-      if (event.target == modal || event.target == closeBtn)
+      function closeModal(event){
+        const closeBtn = modal.querySelector('.close');
+        if (event.target == modal || event.target == closeBtn)
         modal.style.display = "none";
+      }
+      function showModal(){ modal.style.display = "block"; }
     }
-    function showModal(){ modal.style.display = "block"; }
   }
 
 }

@@ -9,7 +9,7 @@ exports.fn = functions.region('europe-west3').https
   const userName = isAdmin ?
     data.admin.forName : context.auth.token.name;
   const phone = isAdmin ?
-    data.admin.forPhone : context.auth.token.phone_number;
+    data.admin.forPhone : formatNumber(context.auth.token.phone_number);
   const mikveName = data.mikveName;
   const time = new Date(data.time);
   const day = time.getDate();
@@ -62,6 +62,7 @@ exports.fn = functions.region('europe-west3').https
   function generateAppointmentKey(){
     return `${mikveName}-${day}-${month}-${year}-${hour}-${uid}`;
   }
+  function formatNumber(n){ return n.replace('+972', '0') }
   function error(t){
     throw new functions.https.HttpsError('permission-denied', t);
   }

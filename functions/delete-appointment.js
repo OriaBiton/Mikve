@@ -16,7 +16,7 @@ exports.fn = functions.region('europe-west3').https
 
   async function remove(){
     const key = await getKey();
-    db.ref(path).remove().catch(e => {throw e});
+    if (!hasPast()) db.ref(path).remove().catch(e => {throw e}); //attended? archive!
     db.ref(`users/${uid}/appointments/${key}`).remove()
       .catch(e => {throw e});
 
@@ -27,4 +27,5 @@ exports.fn = functions.region('europe-west3').https
       return k;
     }
   }
+  function hasPast(){ return new Date() > time }
 });

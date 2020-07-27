@@ -21,6 +21,25 @@ Render.setUI();
 //serviceWorker();
 
 // Function Definitions
+async function starMikve(e){
+  e.preventDefault();
+  const btn = e.target;
+  const modal = btn.closest('.modal');
+  const dontStarBtn = modal.querySelector('#dont-star-btn');
+  const score = parseInt(q('input[name="rate-mikve"]:checked').value);
+  const name = modal.dataset.key;
+  const starMikve = functions.httpsCallable('starMikve');
+  disableBtns(true);
+  await starMikve({name, score});
+  disableBtns(false);
+  Render.closeAskToStar();
+  notyf.success('המקווה דורג בהצלחה. תודה רבה!');
+
+  function disableBtns(b){
+    btn.disabled = b;
+    dontStarBtn.disabled = b;
+  }
+}
 function enableLoadappointmentListBtn(){
   byId('load-appointment-list-btn').disabled = false;
 }
@@ -42,17 +61,18 @@ async function loadAppointments(){
     return obj;
   }
 }
-async function deleteAppointment(){
+async function deleteAppointment(e){
   Render.loading(true);
   const del = functions.httpsCallable('deleteAppointment');
   const data = {
     mikveName: selectedMikve.key,
-    time: getSelectedTime(),
+    time: selectedTime.time,
     hour: selectedTime.hour.value
   };
   await del(data).catch(e => {throw e});
   resetUI();
   Render.loading();
+  if (e) notyf.info('התור נמחק בהצלחה.');
 
   function resetUI(){
     isAppointmentSet = false;
@@ -77,7 +97,7 @@ async function setAppointment(){
   };
   const data = {
     mikveName: selectedMikve.key,
-    time: getSelectedTime(),
+    time: selectedTime.time,
     hour: selectedTime.hour.value,
     obj: JSON.stringify(obj),
     admin: isAdmin ? adminObj : null
@@ -86,11 +106,6 @@ async function setAppointment(){
   isAppointmentSet = true;
   Render.Sections.home();
   notyf.success('התור שלך נרשם בהצלחה!');
-}
-function getSelectedTime(){
-  const d = selectedTime.date;
-  const h = selectedTime.hour;
-  return new Date(`${d.gregYear}-${d.gregMonthInt}-${d.gregDay} ${h.text}`).getTime();
 }
 function setHour(){
   const sect = sections.chooseTime;
@@ -108,6 +123,13 @@ function setHour(){
   function setGlobalVar(){
     selectedTime.date = data;
     selectedTime.hour = {value: hasValue, text: hour};
+    selectedTime.time = getSelectedTime();
+
+    function getSelectedTime(){
+      const d = selectedTime.date;
+      const h = selectedTime.hour;
+      return new Date(`${d.gregYear}-${d.gregMonthInt}-${d.gregDay} ${h.text}`).getTime();
+    }
   }
   function setButton(){
     sect.querySelector('#set-time-btn').disabled = !hasValue;
