@@ -1,14 +1,14 @@
 {
-  "name": "ערבות",
-  "short_name": "ערבות",
+  "name": "מקוואות המועצה הדתית בת ים",
+  "short_name": "מקוואות רבנות בת ים",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#e1eff5",
-  "theme_color": "#3a9cc8",
+  "background_color": "#f8f8f8",
+  "theme_color": "#75c1fd",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/images/android-chrome-512x512.png",
+      "src": "/images/icon.png",
       "type": "image/png",
       "sizes": "512x512"
     },
@@ -16,11 +16,6 @@
       "src": "/images/android-chrome-384x384.png",
       "type": "image/png",
       "sizes": "384x384"
-    },
-    {
-      "src": "/images/mstile-150x150.png",
-      "type": "image/png",
-      "sizes": "270x270"
     },
     {
       "src": "/images/android-chrome-192x192.png",
@@ -48,7 +43,7 @@
       "sizes": "32x32"
     },
     {
-      "src": "/images/favicon-16x16.png",
+      "src": "/images/favicon.png",
       "type": "image/png",
       "sizes": "16x16"
     }

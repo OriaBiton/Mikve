@@ -6,12 +6,21 @@ class Render {
     }
     else q('#star-mikve-modal .close').click();
   }
-  static askToStarMikve(){
-    const modal = byId('star-mikve-modal');
+  static async askToStarMikve(){
     const name = selectedMikve.name;
+    const modal = byId('star-mikve-modal');
     const desc = q('#star-mikve strong');
-    modal.style.display = 'initial';
+    if (!(await isAllowed())) return;
+    modal.hidden = false;
     desc.innerText = `את מוזמנת לדרג את מקווה "${name}" כדי שנדע להשתפר לעתיד:`;
+
+    async function isAllowed(){
+      const ts = await Database.getLatestStarTimestamp();
+      if (!ts) return true;
+      const threeWeeks = 1814400000;
+      if (new Date() - ts > threeWeeks) return true;
+      return false;
+    }
   }
   static setUI(){
     Render.h1Background();
@@ -62,35 +71,11 @@ class Render {
       return checked;
     }
   }
-  static async setAdminUI(user, isRetry){
-    await setGlobalVar();
+  static async setAdminUI(user){
+    await Auth.setAdminGlobalVar(user);
     if (!isAdmin) return;
     qAll('[data-admin-ui]').forEach(el => el.style.display = 'initial');
     qAll('[data-client-ui]').forEach(el => el.style.display = 'none');
-
-    async function setGlobalVar(){
-      const byStorage = localStorage.getItem('isAdmin');
-      if (byStorage == user.uid + ':false') {
-        isAdmin = false; return;
-      }
-      else if (byStorage == user.uid + ':true'){
-        isAdmin = true; return;
-      }
-      const idTokenResult = await user.getIdTokenResult(true);
-      if (idTokenResult.claims.admin){
-        localStorage.setItem('isAdmin', user.uid + ':true');
-        isAdmin = true;
-        console.log('admin!');
-      }
-      else {
-        console.log('not admin');
-        isAdmin = false;
-        if (!isRetry) setTimeout(() => {
-          Render.setAdminUI(user, true);
-          localStorage.setItem('isAdmin', user.uid + ':false');
-        }, 5000);
-      }
-    }
   }
   static showSetAppartmentButton(){
     hide(byId('my-appointment'));
@@ -171,7 +156,7 @@ class Render {
       td.dataset.dayOfWeek = dayOfWeek;
       td.dataset.sunset = getSunset(hDate);
       td.innerHTML = `<span class="date-heb">${td.dataset.hebDay}</span>
-        <span class="date-greg hidden">${gregDay}</span>`;
+        <span class="date-greg" hidden>${gregDay}</span>`;
       if (isToday) {
         td.classList.add('today');
         isInThePast = false;
@@ -184,13 +169,23 @@ class Render {
           .replace('שבת ', '').replace('צום ', '');
       }
       if (!isInThePast && daysToTheFuture <= clickableFutureDays) {
-        td.classList.add('allowed');
-        td.addEventListener('click', setDate);
+        if (!isOffDay()) {
+          td.classList.add('allowed');
+          td.addEventListener('click', setDate);
+          addShabbat();
+        }
         daysToTheFuture++;
-        addShabbat();
       }
       return td;
 
+      function isOffDay(){
+        if (!holidays.length) return false;
+        const txt = holidays[0].desc[2];
+        const offDays = ['כיפור', 'תשעה באב'];
+        for (const day of offDays)
+          if (txt.includes(day)) return true;
+        return false;
+      }
       function addShabbat(){
         let time;
         let timeName;
@@ -294,7 +289,6 @@ Render.Sections = class Sections {
       const takenPayload = {mikveName, dates: datasetsOfAllowed};
       const taken = (await getTakenHours(takenPayload)).data;
       for (const td of allowed) {
-        let hours;
         const isToday = td.hasClass('today');
         const dayData = td.dataset;
         const gregDay = dayData.gregDay;
@@ -303,12 +297,17 @@ Render.Sections = class Sections {
         let dayType = 'weekdays';
         if (candles) dayType = 'friday';
         else if (havdala) dayType = 'saturday';
-        hours = spread(ranges[dayType].from, ranges[dayType].until, dayData);
+        let hours = spread(ranges[dayType].from, ranges[dayType].until, dayData);
         if (isToday) hours = removePastHours(hours);
         dayData.allowedHours = hours;
-        if (taken[gregDay]) dayData.takenHours = taken[gregDay];
+        if (!dayData.allowedHours) {
+          td.classList.remove('allowed');
+          td.removeEventListener('click', setDate);
+          continue;
+        }
+        if (taken[gregDay]) dayData.takenHours =
+          isToday ? removePastHours(taken[gregDay]) : taken[gregDay];
         td.dataset.ready = true;
-        td.addEventListener('click', setDate);
       }
       if (tdToClick) tdToClick.click();
 
@@ -415,7 +414,7 @@ Render.Sections = class Sections {
     if (!user) return notyf.error('אינכם מחוברים למערכת עדיין.');
 
     const sect = sections.settings;
-    if (!sect.hasClass('hidden')) return back();
+    if (!sect.hidden) return back();
     show();
 
     function show(){

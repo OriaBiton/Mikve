@@ -44,6 +44,7 @@ class Listeners {
     byId('load-appointment-list-btn').addEventListener('click', loadAppointments);
     qAll('[name="load-appointments-date"]').forEach(i =>
       i.addEventListener('change', enableLoadappointmentListBtn));
+    byId('print-appointments-btn').addEventListener('click', printAppointments);
   }
   static addListenersToSettingsSection(){
     byId('settings-btn').addEventListener('click', Render.Sections.settings);
@@ -61,9 +62,9 @@ class Listeners {
       function closeModal(event){
         const closeBtn = modal.querySelector('.close');
         if (event.target == modal || event.target == closeBtn)
-        modal.style.display = "none";
+          hide(modal);
       }
-      function showModal(){ modal.style.display = "block"; }
+      function showModal(){ unhide(modal); }
     }
   }
 

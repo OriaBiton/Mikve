@@ -294,7 +294,7 @@ td.holiday::before{
 	position: absolute;
 	bottom: 0; right: 3px;
 }
-td.today::before{
+td.today::after{
 	content: '';
 	padding: .6rem;
 	background-color: var(--color2);
@@ -447,7 +447,6 @@ footer{
 }
 .modal h1 {font-size: 2rem; margin: 0;}
 .modal {
-	display: none;
 	position: fixed;
 	z-index: 2;
 	padding-top: 100px;
@@ -569,4 +568,17 @@ footer{
 	td.first-in-heb-month::before,
 	td.first-in-greg-month::before,
 	td.holiday::before{font-size: 1.2rem}
+}
+
+@media print {
+	table{width: 100%;border: 1px solid var(--grey)}
+	tr {height: 7rem}
+	thead tr{height: unset}
+	th{font-weight: bold;}
+	td, th{
+		padding: 1rem;
+		text-align: center;
+		line-height: 2.5rem;
+		font-size: 2.5rem;
+	}
 }

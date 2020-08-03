@@ -4,14 +4,16 @@
 	<title>מקוואות המועצה הדתית בת ים</title>
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<meta name="viewport" content="width=device-width">
-	<meta name="theme-color" content="#3a9cc8">
+	<meta charset="utf-8">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik&display=swap">
+	<meta name="theme-color" content="#f8f8f8">
 	<link rel="shortcut icon" href="images/favicon.ico">
 	<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
-	<link rel="manifest" href="manifest.json">
 	<link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<link rel="manifest" href="manifest.json">
 </head>
 <body>
 	<svg class="header-wave" viewBox="0 0 500 60" preserveAspectRatio="none" width: "100%">
@@ -21,8 +23,7 @@
 				<stop offset="100%"></stop>
 			</linearGradient>
 		</defs>
-		<path d="M0.00,39.98 C150 ,110 271,
-			-90 500,39.98 L500,0 L0,0 Z"></path>
+		<path d="M0 39 C150 110 271 -90 500 39 L500 0 L0 0 Z"></path>
 	</svg>
 	<div id="is-nav"></div>
 	<nav>
@@ -41,7 +42,7 @@
 		<div id="loading" class="middle mt-10">
 			<img src=images/loading.svg>
 		</div>
-		<section id="enter-via-sms" class="hidden">
+		<section id="enter-via-sms" hidden>
 			<h1>כניסה</h1>
 			<form class="p-side-3">
 				<h2>🧾 מלאי את הפרטים והכנסי לחשבונך האישי.</h2>
@@ -60,7 +61,7 @@
 			</form>
 		</section>
 
-		<section id="sms-msg" class="hidden">
+		<section id="sms-msg" hidden>
 			<h1>אימות מספר טלפון</h1>
 			<form class="p-side-3">
 				<h2>📱 הזינו את הקוד שנשלח אליכם בהודעת SMS:</h2>
@@ -77,12 +78,12 @@
 			</form>
 		</section>
 
-		<section id="home" class="hidden">
+		<section id="home" hidden>
 			<h1>דף הבית</h1>
 			<div class="p-side-3">
 				<h2 id="greeting"></h2>
 				<div class="middle">
-					<div id="my-appointment" class="hidden" data-client-ui>
+					<div id="my-appointment" hidden data-client-ui>
 						<h2>📍 התור הבא שלך:</h2>
 					</div>
 					<button id="set-appointment-btn">לקביעת תור</button>
@@ -96,7 +97,7 @@
 					<img src="images/whatsapp.png" title="ווצאפ מחלקת מקוואות" class="pointer">
 				</div>
 			</div>
-			<div class="modal" id="star-mikve-modal" data-client-ui>
+			<div class="modal" id="star-mikve-modal" data-client-ui hidden>
 				<div class="modal-content">
 					<span class="close">×</span>
 					<div class="modal-header">
@@ -125,7 +126,7 @@
 			</div><!-- Modal -->
 		</section>
 
-		<section id="choose-mikve" class="hidden">
+		<section id="choose-mikve" hidden>
 			<h1>בחירת מקווה</h1>
 			<div class="p-side-3 pos-rel">
 				<span class="back" onclick="Render.Sections.home(event)" title="חזרה לדף הבית">
@@ -138,7 +139,7 @@
 			</div>
 		</section>
 
-		<section id="choose-time" class="hidden">
+		<section id="choose-time" hidden>
 			<h1>יום ושעה</h1>
 			<div class="p-side-3 pos-rel">
 				<span class="back" onclick="Render.Sections.chooseMikve(event)" title="חזרה לבחירת מקווה">
@@ -176,7 +177,7 @@
 			</div>
 		</section>
 
-		<section id="confirm" class="hidden">
+		<section id="confirm" hidden>
 			<h1>אישור</h1>
 			<div class="p-side-3 pos-rel">
 				<span class="back" onclick="Render.Sections.chooseTime(event)" title="חזרה לבחירת יום ושעה">
@@ -199,7 +200,7 @@
 
 		</section>
 
-		<section id="appointments" class="hidden">
+		<section id="appointments" hidden>
 			<h1>רשימת תורים</h1>
 			<div class="p-side-3 pos-rel">
 				<span class="back" onclick="Render.Sections.home(event)" title="חזרה לדף הבית">
@@ -215,6 +216,9 @@
 					<input type="number" name="load-appointments-date" data-part="day">
 				</div>
 				<button id="load-appointment-list-btn">טעינת רשימה</button>
+				<a id="print-appointments-btn" class="pointer">
+					<h2 class="inline">🖨️ הדפסה</h2>
+				</a>
 				<table>
 					<thead>
 						<tr>
@@ -226,11 +230,10 @@
 					</thead>
 					<tbody></tbody>
 				</table>
-
 			</div>
 		</section>
 
-		<section id="settings" class="hidden">
+		<section id="settings" hidden>
 			<h1>הגדרות</h1>
 			<div class="p-side-3">
 				<p class="mb-0">

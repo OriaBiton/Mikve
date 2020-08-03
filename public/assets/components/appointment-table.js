@@ -4,14 +4,14 @@ const appointmentTableTemplate = `
       <tr>
         <th>💧 מקווה</th>
         <th>🕒 זמן</th>
-        <th class="actions hidden">🔧 פעולות</th>
+        <th class="actions" hidden>🔧 פעולות</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="mikve-desc"></td>
         <td class="time-desc"></td>
-        <td class="actions-td hidden">
+        <td class="actions-td" hidden>
           <a class="waze-btn" target="_blank">
             <button><img src="images/waze.png">ניווט</button>
           </a>

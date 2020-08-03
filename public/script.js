@@ -21,6 +21,18 @@ Render.setUI();
 //serviceWorker();
 
 // Function Definitions
+function printAppointments(e) {
+  e.preventDefault();
+  const table = q('#appointments table');
+  const date = table.dataset;
+  const html = `${document.head.outerHTML}
+    <h2>${date.day}/${date.month}/${date.year}</h2>
+    ${table.outerHTML}`;
+  const newWin = window.open("");
+  newWin.document.write(html);
+  newWin.print();
+  newWin.close();
+}
 async function starMikve(e){
   e.preventDefault();
   const btn = e.target;
@@ -48,9 +60,14 @@ async function loadAppointments(){
   const name = selectedMikve.key;
   const date = getDate();
   await Database.bindAppointmentList(name, date);
+  addDataset();
   Render.loading();
   notyf.success('הרשימה נטענה בהצלחה ותתעדכן בעמוד אוטומטית');
 
+  function addDataset(){
+    const table = q('#appointments table');
+    for (const i in date) table.dataset[i] = date[i];
+  }
   function getDate(){
     const obj = {};
     const dateInputs = qAll('input[name="load-appointments-date"]');
@@ -183,12 +200,12 @@ function setDate(e){
         const o = select.querySelector(`[value="${t}"]`);
         o.disabled = true;
         o.innerText += ' ❌';
-
       }
     }
     function addAllowed(){
       const allowedHours = data.allowedHours.split(',');
       for (const hour of allowedHours) {
+        if (!hour) continue;
         const opt = document.createElement('option');
         opt.value = hour;
         opt.innerText = Format.addColon(hour);
@@ -358,7 +375,7 @@ function setMobileNav(){
   hamburger.nav.addEventListener('click', () => hamburger.doToggle());
 }
 function getActiveSection(){
-  return q('section:not(.hidden)');
+  return q('section:not([hidden])');
 }
 function closeModal(){
   let modals = Array.from(byClass('modal'));
@@ -372,7 +389,7 @@ function closeModal(){
 function getNotyf(){
   loadCss('assets/notyf/notyf.min.css');
   return new Notyf({
-    duration: 8000,
+    duration: 7000,
     position: {x: 'right', y: 'top'},
     dismissible: true,
     types: [{

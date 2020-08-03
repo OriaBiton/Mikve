@@ -53,8 +53,8 @@ exports.fn = functions.region('europe-west3').https
       await db.ref(latestStarTimePath).once('value', snap => {
         const latestTimeStamp = snap.val();
         if (!latestTimeStamp) allowed = true;
-        const halfDay = 60000; //should be 3 weeks
-        if (new Date() - latestTimeStamp > halfDay) allowed = true;
+        const threeWeeks = 1814400000;
+        if (new Date() - latestTimeStamp > threeWeeks) allowed = true;
       }).catch(e => {throw e});
       return allowed;
     }

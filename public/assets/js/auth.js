@@ -71,6 +71,30 @@ class Auth {
 
   static authProvider(){return Auth.getUser().providerData[0].providerId;}
 
+  static async setAdminGlobalVar(user, isRetry){
+    const byStorage = localStorage.getItem('isAdmin');
+    if (byStorage == user.uid + ':false') {
+      isAdmin = false; return;
+    }
+    else if (byStorage == user.uid + ':true'){
+      isAdmin = true; return;
+    }
+    const idTokenResult = await user.getIdTokenResult(true);
+    if (idTokenResult.claims.admin){
+      localStorage.setItem('isAdmin', user.uid + ':true');
+      isAdmin = true;
+      console.log('admin!');
+    }
+    else {
+      console.log('not admin');
+      isAdmin = false;
+      if (!isRetry) setTimeout(() => {
+        Auth.setAdminGlobalVar(user, true);
+        localStorage.setItem('isAdmin', user.uid + ':false');
+      }, 5000);
+    }
+  }
+
   static showErrors(err){
     let notification;
     const msg = err.message;

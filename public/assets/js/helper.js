@@ -8,7 +8,7 @@ function insertAfter(newNode, referenceNode) {
       .insertBefore(newNode, referenceNode.nextSibling);
 }
 function isHidden(el) {
-  return (el.offsetParent === null)
+  return el.offsetParent === null;
 }
 function loadCss(path) {
     let l = document.createElement('link');
@@ -17,14 +17,14 @@ function loadCss(path) {
     let h = document.getElementsByTagName('head')[0];
     h.parentNode.insertBefore(l, h);
 }
-function toggleHide(el){
-  el.classList.toggle('hidden');
-}
+function toggleHide(el){ el.hidden = !isHidden(el); }
 function unhide(el){
-  el.classList.remove('hidden');
+  if (el.tagName == 'svg') return el.classList.remove('hidden');
+  el.hidden = false;
 }
 function hide(el){
-  el.classList.add('hidden');
+  if (el.tagName == 'svg') return el.classList.add('hidden');
+  el.hidden = true;
 }
 function q(selector){
   return document.querySelector(selector);

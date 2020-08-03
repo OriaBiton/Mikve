@@ -1,5 +1,11 @@
 class Database {
-
+  static async getLatestStarTimestamp(){
+    const uid = Auth.getUser().uid;
+    const path = `users/${uid}/latestStarTimestamp`;
+    let ts;
+    await db.ref(path).once('value', s => ts = s.val());
+    return ts;
+  }
   static async bindAppointmentList(name, date){
     if (Database.appointmentListRef) Database.appointmentListRef.off('value');
     const path = `appointments/${name}/${date.year}/${date.month}/${date.day}`;
