@@ -12,7 +12,6 @@ const sections = getSections();
 const db = firebase.database();
 const functions = firebase.app().functions('europe-west3');
 const notyf = getNotyf();
-Hebcal.defaultCity = 'Jerusalem';
 
 // Invokations
 if (isMobile) setMobileNav();
@@ -158,77 +157,7 @@ function setHour(){
     p.innerText = hasValue ? txt : '';
   }
 }
-function setDate(e){
-  const td = e.target.nodeName == 'TD' ?
-    e.target : e.target.closest('td');
-  const isActive = td.classList.contains('active');
-  const sect = sections.chooseTime;
-  const data = td.dataset;
-  if (!data.ready) {
-    notyf.info('טוען לוח שעות. כמה רגעים בבקשה...');
-    tdToClick = td;
-    return;
-  }
-  if (tdToClick && tdToClick.isSameNode(td)){
-    tdToClick = null;
-    notyf.success('לוח השעות מוכן! את מוזמנת לבחור שעה.');
-  }
 
-  markDate();
-  fillHourSelect();
-  clearDescription();
-  disableButton();
-
-  function disableButton(){
-    sect.querySelector('#set-time-btn').disabled = true;
-  }
-  function clearDescription(){
-    sect.querySelector('.description').innerText = '';
-  }
-  function fillHourSelect(){
-    const select = byId('select-hour');
-    select.disabled = isActive;
-    clear();
-    addAllowed();
-    disableTaken();
-
-    function disableTaken(){
-      let taken = data.takenHours;
-      if (!taken) return;
-      taken = taken.split(',');
-      for (const t of taken){
-        const o = select.querySelector(`[value="${t}"]`);
-        o.disabled = true;
-        o.innerText += ' ❌';
-      }
-    }
-    function addAllowed(){
-      const allowedHours = data.allowedHours.split(',');
-      for (const hour of allowedHours) {
-        if (!hour) continue;
-        const opt = document.createElement('option');
-        opt.value = hour;
-        opt.innerText = Format.addColon(hour);
-        select.add(opt);
-      }
-    }
-    function clear(){
-      for (let i = select.length; i > 0; i--) select.remove(i);
-    }
-  }
-  function markDate(){
-    const tbody = td.closest('tbody');
-    if (isActive) return deactivate();
-    const currentlyActive = tbody.querySelector('td.active');
-    deactivate(currentlyActive);
-    td.classList.add('active');
-
-    function deactivate(c){
-      if (c) c.classList.remove('active');
-      else td.classList.remove('active');
-    }
-  }
-}
 function selectMikve(e){
   const sect = sections.chooseMikve;
   const card = e.target.closest('.card');

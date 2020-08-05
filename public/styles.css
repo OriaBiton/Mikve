@@ -34,6 +34,11 @@ body {
 	background-repeat: no-repeat;
 	background-size: cover
 }
+.logo{
+	max-width: 8%;
+	position: absolute;
+	top: 2rem; right: 2rem;
+}
 .header-wave stop[offset="0%"]{stop-color: var(--color1)}
 .header-wave stop[offset="100%"]{stop-color: var(--color2)}
 .header-wave path{fill: url(#grad)}
@@ -93,7 +98,6 @@ button, input[type="submit"] {
 	margin: 2.5rem auto;
 	color: var(--brightest);
 	border-radius: 3px;
-	display: inline-block;
 	transition: .1s linear;
 	border: none;
 	cursor: pointer;
@@ -262,7 +266,7 @@ table button{
 	font-size: 1.7rem;
 }
 th{font-weight: normal;}
-#date-table th{width: calc(100% / 7)}
+calendar-table th{width: calc(100% / 7)}
 appointment-table th{width: calc(100% / 3)}
 tr{
 	background-color:var(--bg-color);
@@ -482,7 +486,10 @@ footer{
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     -moz-tap-highlight-color: rgba(0, 0, 0, 0);
 	}
-	.app-desktop-head{height: 0}
+	.logo{
+		max-width: 10%;
+		top: 1rem; right: 1rem;
+	}
   .container{width: 95%}
   section{margin: 1rem 0; width: 100%;}
 	h1{font-size: 3.3rem;}

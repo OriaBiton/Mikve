@@ -4,7 +4,6 @@
 	<title>מקוואות המועצה הדתית בת ים</title>
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<meta name="viewport" content="width=device-width">
-	<meta charset="utf-8">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik&display=swap">
 	<meta name="theme-color" content="#f8f8f8">
 	<link rel="shortcut icon" href="images/favicon.ico">
@@ -16,7 +15,8 @@
 	<link rel="manifest" href="manifest.json">
 </head>
 <body>
-	<svg class="header-wave" viewBox="0 0 500 60" preserveAspectRatio="none" width: "100%">
+	<img src="images/logo.png" class="logo" title="מקוואות המועצה הדתית בת ים">
+	<svg class="header-wave" viewBox="0 0 500 55" preserveAspectRatio="none" width: "100%">
 		<defs>
 			<linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
 				<stop offset="0%"></stop>
@@ -152,21 +152,7 @@
 					<input id="schedule-to-greg" type="radio" value="greg" name="schedule-type">
 					<label for="schedule-to-greg" class="inline">לועזי</label>
 				</div>
-				<table id="date-table" class="mb-2">
-					<thead>
-						<tr>
-							<th>ראשון</th>
-							<th>שני</th>
-							<th>שלישי</th>
-							<th>רביעי</th>
-							<th>חמישי</th>
-							<th>שישי</th>
-							<th>שבת</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
+				<calendar-table></calendar-table>
 				<div class="select center">
 					<select id="select-hour" disabled>
 						<option value="" selected>בחרי שעה</option>
@@ -274,15 +260,14 @@
 	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-functions.js"></script>
 	<script src="assets/notyf/notyf.min.js"></script>
 	<script src="assets/hebcal/hebcal.noloc.min.js"></script>
+	<script src="assets/js/render.js"></script>
 	<script src="assets/js/auth.js"></script>
 	<script src="assets/js/database.js"></script>
 	<script src="assets/js/helper.js"></script>
-	<!-- <script src="assets/js/map.js"></script> -->
-	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDW04Xy36GVvOHkODIRBhMsV4m1awLfZeg&libraries=places&language=he&region=IL&callback=initMap" async defer></script> -->
 	<script src="assets/js/format.js"></script>
-	<script src="assets/js/render.js"></script>
 	<script src="assets/js/listeners.js"></script>
 	<script src="assets/components/polyfill/loader.js"></script>
+	<script src="assets/components/calendar.js"></script>
 	<script src="assets/components/appointment-table.js"></script>
 	<script src="assets/components/mikve-card.js"></script>
 	<script src="script.js"></script>

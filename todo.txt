@@ -1,1 +1,0 @@
-why Render is not defined sometimes (first browser load?)
