@@ -1,4 +1,16 @@
 class Format {
+  static dateToColon(d){
+    let mins = d.getMinutes();
+    let hours = d.getHours();
+    mins = addZero(mins);
+    hours = addZero(hours);
+    return  hours + ':' + mins;
+
+    function addZero(n){
+      if (n < 10) return '0' + n;
+      else return n;
+    }
+  }
   static addColon(s){
     return s.slice(0, 2) + ':' + s.slice(2);
   }

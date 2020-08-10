@@ -104,12 +104,12 @@ class Calendar extends HTMLElement {
           time = havdala;
         }
         else return;
-        td.dataset[timeName] = `${time.getHours()}:${time.getMinutes()}`;
+        td.dataset[timeName] = Format.dateToColon(time);
       }
     }
     function getSunset(d){
       const eve = d.gregEve();
-      return `${eve.getHours()}:${eve.getMinutes()}`;
+      return Format.dateToColon(eve);
     }
     function gematriya(n){
       const letters = [
@@ -260,11 +260,6 @@ class Calendar extends HTMLElement {
         iM -= 60;
       }
       return arr;
-
-      function ConvertToHourString(date){
-        const dt = new Date(date);
-        return dt.getHours() + ':' + dt.getMinutes();
-      }
     }
 
   }
