@@ -115,7 +115,7 @@ async function setAppointment(){
     mikveName: selectedMikve.key,
     time: selectedTime.time,
     hour: selectedTime.hour.value,
-    obj: JSON.stringify(obj),
+    obj: obj,
     admin: isAdmin ? adminObj : null
   };
   await set(data).catch(e => {throw e});
@@ -144,7 +144,7 @@ function setHour(){
     function getSelectedTime(){
       const d = selectedTime.date;
       const h = selectedTime.hour;
-      return new Date(`${d.gregYear}-${d.gregMonthInt}-${d.gregDay} ${h.text}`).getTime();
+      return new Date(`${d.gregYear}/${d.gregMonthInt}/${d.gregDay} ${h.text}`).getTime();
     }
   }
   function setButton(){

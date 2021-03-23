@@ -215,7 +215,7 @@ Render.Sections = class Sections {
           await db.ref(path).once('value', snap => {
             if (snap.exists()) {
               const obj = Object.values(snap.val())[0];
-              data = JSON.parse(obj.data);
+              data = obj.data;
             }
           });
           return data;
