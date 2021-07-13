@@ -17,7 +17,7 @@ const notyf = getNotyf();
 if (isMobile) setMobileNav();
 Listeners.addAllDocumentListeners();
 Render.setUI();
-//serviceWorker();
+serviceWorker();
 
 // Function Definitions
 function printAppointments(e) {
@@ -55,14 +55,24 @@ function enableLoadappointmentListBtn(){
   byId('load-appointment-list-btn').disabled = false;
 }
 async function loadAppointments(){
+  if (!selectedMikve) return notyf.info('נא לבחור מקווה');
   Render.loading(true);
   const name = selectedMikve.key;
   const date = getDate();
+  setH2();
   await Database.bindAppointmentList(name, date);
   addDataset();
   Render.loading();
   notyf.success('הרשימה נטענה בהצלחה ותתעדכן בעמוד אוטומטית');
 
+  function setH2(){
+    const h2 = byId('showing-appointments-header');
+    const o = {
+      name: selectedMikve.name,
+      d: date.day, m: date.month, y: date.year
+    };
+    h2.innerHTML = `${o.name} - ${o.d}/${o.m}/${o.y}`;
+  }
   function addDataset(){
     const table = q('#appointments table');
     for (const i in date) table.dataset[i] = date[i];
@@ -88,7 +98,8 @@ async function deleteAppointment(e){
   await del(data).catch(e => {throw e});
   resetUI();
   Render.loading();
-  if (e) notyf.info('התור נמחק בהצלחה.');
+  console.log(e);
+  if (e) notyf.success('התור נמחק בהצלחה.');
 
   function resetUI(){
     isAppointmentSet = false;
@@ -258,6 +269,7 @@ async function applySettings(e){
 }
 function onSignInSubmit(e){
   e.preventDefault();
+  Render.loading(true);
   let phone = byId('phone').value;
   phone = formatNumber(phone);
   Auth.sendSmsCode(phone);
@@ -269,6 +281,7 @@ function formatNumber(p){
 }
 async function registerUser(e){
   e.preventDefault();
+  Render.loading(true);
   const form = q('#enter-via-sms form');
   const name = getVal('name');
   const phone = getVal('phone');

@@ -289,7 +289,6 @@ td.date:not(.allowed){opacity: .4}
 td.today, td.first-in-heb-month, td.first-in-greg-month, td.holiday{
 	position: relative;
 }
-td.date::before{font-size: 1.5rem;}
 td.first-in-heb-month::before,
 td.first-in-greg-month::before,
 td.holiday::before{
@@ -297,6 +296,8 @@ td.holiday::before{
 	color: var(--color2);
 	position: absolute;
 	bottom: 0; right: 3px;
+	line-height: 1.5rem;
+	font-size: 1rem;
 }
 td.today::after{
 	content: '';

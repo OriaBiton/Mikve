@@ -13,9 +13,9 @@ const appointmentTableTemplate = `
         <td class="time-desc"></td>
         <td class="actions-td" hidden>
           <a class="waze-btn" target="_blank">
-            <button><img src="images/waze.png">ניווט</button>
+            <button><img src="images/waze.png">נווט</button>
           </a>
-          <button class="danger delete-btn">מחיקה</button>
+          <button class="danger delete-btn">בטל תור</button>
         </td>
       </tr>
     </tbody>

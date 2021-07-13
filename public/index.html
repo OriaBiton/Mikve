@@ -13,6 +13,23 @@
 	<link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
 	<meta name="msapplication-TileColor" content="#da532c">
 	<link rel="manifest" href="manifest.json">
+	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js" defer></script>
+	<script src="assets/js/firebase-init.js" defer></script>
+	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js" defer></script>
+	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js" defer></script>
+	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-functions.js" defer></script>
+	<script src="assets/notyf/notyf.min.js" defer></script>
+	<script src="assets/hebcal/hebcal.noloc.min.js" defer></script>
+	<script src="assets/js/render.js" defer></script>
+	<script src="assets/js/auth.js" defer></script>
+	<script src="assets/js/database.js" defer></script>
+	<script src="assets/js/helper.js" defer></script>
+	<script src="assets/js/format.js" defer></script>
+	<script src="assets/js/listeners.js" defer></script>
+	<script src="assets/components/calendar.js" defer></script>
+	<script src="assets/components/appointment-table.js" defer></script>
+	<script src="assets/components/mikve-card.js" defer></script>
+	<script src="script.js" defer></script>
 </head>
 <body>
 	<img src="images/logo.png" class="logo" title="מקוואות המועצה הדתית בת ים">
@@ -67,7 +84,10 @@
 				<h2>📱 הזינו את הקוד שנשלח אליכם בהודעת SMS:</h2>
 				<div class="field">
 					<label for="sms-code">קוד בן 6 ספרות</label>
-					<input type="number" id="sms-code" name="sms-code" max="999999" required placeholder="הזינו את הקוד שקיבלתם במסרון">
+					<input type="text" inputmode="numeric"
+						id="sms-code" name="sms-code"
+						placeholder="הזינו את הקוד שקיבלתם במסרון"
+						autocomplete="one-time-code" required>
 				</div>
 				<div class="middle">
 					<button type="submit">אישור</button>
@@ -178,7 +198,7 @@
 					</div>
 					<div class="field">
 						<label for="admin-appointment-phone-input">מספר טלפון:</label>
-						<input type="phone" id="admin-appointment-phone-input" required>
+						<input type="tel" id="admin-appointment-phone-input" required>
 					</div>
 				</form>
 				<button id="confirm-btn">אישור תור</button>
@@ -202,6 +222,7 @@
 					<input type="number" name="load-appointments-date" data-part="day">
 				</div>
 				<button id="load-appointment-list-btn">טעינת רשימה</button>
+				<h2 id="showing-appointments-header" class="middle"></h2>
 				<a id="print-appointments-btn" class="pointer">
 					<h2 class="inline">🖨️ הדפסה</h2>
 				</a>
@@ -252,24 +273,5 @@
 	  כל הזכויות שמורות לאוריה ביטון | Copyright  © 2020 All rights reserved to Oria Biton
 		</small></p>
 	</footer>
-
-	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
-	<script src="assets/js/firebase-init.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-functions.js"></script>
-	<script src="assets/notyf/notyf.min.js"></script>
-	<script src="assets/hebcal/hebcal.noloc.min.js"></script>
-	<script src="assets/js/render.js"></script>
-	<script src="assets/js/auth.js"></script>
-	<script src="assets/js/database.js"></script>
-	<script src="assets/js/helper.js"></script>
-	<script src="assets/js/format.js"></script>
-	<script src="assets/js/listeners.js"></script>
-	<script src="assets/components/polyfill/loader.js"></script>
-	<script src="assets/components/calendar.js"></script>
-	<script src="assets/components/appointment-table.js"></script>
-	<script src="assets/components/mikve-card.js"></script>
-	<script src="script.js"></script>
 </body>
 </html>
